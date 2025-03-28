@@ -16,7 +16,7 @@ export default function WelcomeScreen() {
       const token = await SecureStore.getItemAsync("authToken"); //using expo-secure-store to store authentication tokens
 
       if (true) {
-        router.replace("/home");
+        router.replace('/home');
       } else {
         router.replace("/auth/sign-in");
       }

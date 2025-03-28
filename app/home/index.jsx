@@ -1,16 +1,21 @@
 import React from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import { NavigationContainer } from "@react-navigation/native";
 import {
   Text,
   View,
   StyleSheet,
   ImageBackground,
   TouchableOpacity,
+  Image,
+  Dimensions
 } from "react-native";
-import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import CustomDrawerNavigator from "../components/CustomDrawerNavigator";
+import ClockInOutScreen from "../attendance";
+
 
 const Drawer = createDrawerNavigator();
+const { width, height } = Dimensions.get("window");
 
 function HomeScreen() {
   return (
@@ -19,65 +24,62 @@ function HomeScreen() {
       style={styles.background}
     >
       <View style={styles.overlay}>
-        <View style={styles.content}>
-          <Text style={styles.title}>TrackIt:</Text>
+      <View style={styles.profileSection}>
+        <View style={styles.avatarWrapper}>
+          <MaterialCommunityIcons name="account-circle" size={90} color="gray" />
+        </View>
+        <View style={styles.welcomeText}>
+          <Text style={styles.welcome}>Welcome, Ahmed!</Text>
           <Text style={styles.subtitle}>
-            Secure Your Presence, Simplify Your Day
+            Secure Your Presence, {"\n"}Simplify Your Day.
           </Text>
         </View>
-        <View style={styles.buttonContainer}>
-          {/* Check In Button */}
-          <View style={styles.buttonWrapper}>
-            <TouchableOpacity style={styles.checkInButton}>
-              <MaterialCommunityIcons
-                name="map-marker-check"
-                size={30}
-                color="white"
-              />
-            </TouchableOpacity>
-            <Text style={styles.buttonText}>Check In</Text>
-          </View>
+      </View>
+      <View style={styles.content}>
+        
+        <TouchableOpacity style={styles.actionButton}>
+          <MaterialCommunityIcons name="fingerprint" size={30} color="#ac0808" />
+          <Text style={styles.actionLabel}>Clock In/Out</Text>
+        </TouchableOpacity>
 
-          {/* Check Out Button */}
-          <View style={styles.buttonWrapper}>
-            <TouchableOpacity style={styles.checkOutButton}>
-              <MaterialIcons name="location-off" size={30} color="white" />
-            </TouchableOpacity>
-            <Text style={styles.buttonText}>Check Out</Text>
-          </View>
-        </View>
+        <TouchableOpacity style={styles.actionButton}>
+          <MaterialIcons name="report-problem" size={30} color="#ac0808" />
+          <Text style={styles.actionLabel}>Report Found/Lost Item</Text>
+        </TouchableOpacity>
+      </View >
+        
       </View>
     </ImageBackground>
   );
 }
 
-function ProfileScreen() {
+
+
+function ReportFoundLostScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Profile Screen</Text>
+      <Text style={styles.text}>Report Found/Lost Item Screen</Text>
+    </View>
+  );
+}
+
+function LogoutScreen() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>Logout Screen</Text>
     </View>
   );
 }
 
 export default function App() {
-  return (
-      <Drawer.Navigator
-        initialRouteName="Home"
-        screenOptions={{
-          drawerStyle: {
-            backgroundColor: "rgba(0, 0, 0, 0.5)", // Transparent background
-            width: 250, // Drawer width
-          },
-          overlayColor: "transparent", // No overlay color
-          drawerContentStyle: {
-            paddingTop: 20,
-          },
-        }}
-      >
-        <Drawer.Screen name="Home" component={HomeScreen} />
-        <Drawer.Screen name="Profile" component={ProfileScreen} />
-      </Drawer.Navigator>
-  );
+  const screens = [
+    { name: "Home", component: HomeScreen, title: "Home" },
+    { name: "Clock In/Out", component: ClockInOutScreen, title: "Clock In/Out" },
+    { name: "Report Found/Lost Item", component: ReportFoundLostScreen, title: "Report Found/Lost Item" },
+    { name: "Logout", component: LogoutScreen, title: "Logout" },
+  ];
+
+  return <CustomDrawerNavigator screens={screens} />;
 }
 
 const styles = StyleSheet.create({
@@ -87,16 +89,46 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
     flexDirection: "column",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-around",
+    paddingBottom: 30,
+  },
+  profileSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: "rgba(211, 211, 211, 0.212)",
+    borderRadius: 10,
+    marginHorizontal: 20,
+    width: "85%",
   },
   content: {
-    flex: 1,
     alignItems: "center",
-    justifyContent: "flex-start", 
-    marginTop: 100, 
+    justifyContent: "space-around",
+    marginTop: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: "rgba(211, 211, 211, 0.212)",
+    borderRadius: 10,
+    marginHorizontal: 20,
+    marginVertical: 30,
+    width: "85%",
+    height: height * 0.35, 
+  },
+  avatarWrapper: {
+    marginRight: 15,
+  },
+  welcomeText: {
+    flexDirection: "column",
+  },
+  welcome: {
+    fontSize: 20,
+    color: "#ac0808",
+    fontWeight: "bold",
   },
   title: {
     color: "white",
@@ -106,9 +138,10 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     color: "white",
-    fontSize: 16,
+    fontSize: 12,
     textAlign: "center",
     marginBottom: 30,
+    marginTop: 5,
   },
   buttonContainer: {
     flexDirection: "row",
@@ -117,6 +150,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     alignItems: "center",
     marginBottom: 120,
+  },
+  actionButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FAFAFA",
+    borderRadius: 10,
+    padding: 15,
+    width: "98%",
+    elevation: 5,
   },
   buttonWrapper: {
     alignItems: "center",
@@ -154,3 +196,4 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
