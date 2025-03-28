@@ -1,4 +1,3 @@
-// filepath: /home/menna/Documents/ITI/Django/Graduation Project/ITI-Attendance-FrontendRN/app/index.jsx
 import React, { useEffect } from "react";
 import { View, Text, Image, Dimensions, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
