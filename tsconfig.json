@@ -15,5 +15,5 @@
     "expo-env.d.ts",
     "app-example/components/SignOutButton.jsx",
     "nativewind-env.d.ts"
-  ]
+, "app/(drawer)/_layout.jsx"  ]
 }
