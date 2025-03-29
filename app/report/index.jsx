@@ -9,7 +9,7 @@ import {
   Image,
   Alert,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker"; // Import Picker
+import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 
 const { width } = Dimensions.get("window");
@@ -18,7 +18,7 @@ export default function ReportScreen() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [place, setPlace] = useState("");
-  const [status, setStatus] = useState("LOST"); // Default to "Lost"
+  const [status, setStatus] = useState("LOST"); 
   const [image, setImage] = useState(null);
 
   useEffect(() => {
@@ -108,7 +108,6 @@ export default function ReportScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Report Lost/Found Item</Text>
 
-      {/* Name Field */}
       <TextInput
         style={styles.input}
         placeholder="Item Name"
@@ -142,7 +141,6 @@ export default function ReportScreen() {
         </Picker>
       </View>
 
-      {/* Image Picker */}
       <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
         <Text style={styles.imagePickerText}>Pick an Image</Text>
       </TouchableOpacity>
