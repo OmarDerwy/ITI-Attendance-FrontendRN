@@ -1,4 +1,5 @@
 import React from "react";
+import { useRouter } from "expo-router";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import {
   Text,
@@ -12,42 +13,49 @@ import {
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import CustomDrawerNavigator from "../components/CustomDrawerNavigator";
 import ClockInOutScreen from "../attendance";
+import ReportScreen from "../report";
+import LogoutScreen from "../logout";
 
 
 const Drawer = createDrawerNavigator();
 const { width, height } = Dimensions.get("window");
 
-function HomeScreen() {
+function HomeScreen({ navigation }) {
+  const router = useRouter();
+
   return (
     <ImageBackground
       source={require("../../assets/images/home-bg.webp")}
       style={styles.background}
     >
       <View style={styles.overlay}>
-      <View style={styles.profileSection}>
-        <View style={styles.avatarWrapper}>
-          <MaterialCommunityIcons name="account-circle" size={90} color="gray" />
+        <View style={styles.profileSection}>
+          <View style={styles.avatarWrapper}>
+            <MaterialCommunityIcons name="account-circle" size={90} color="gray" />
+          </View>
+          <View style={styles.welcomeText}>
+            <Text style={styles.welcome}>Welcome, Ahmed!</Text>
+            <Text style={styles.subtitle}>
+              Secure Your Presence, {"\n"}Simplify Your Day.
+            </Text>
+          </View>
         </View>
-        <View style={styles.welcomeText}>
-          <Text style={styles.welcome}>Welcome, Ahmed!</Text>
-          <Text style={styles.subtitle}>
-            Secure Your Presence, {"\n"}Simplify Your Day.
-          </Text>
-        </View>
-      </View>
-      <View style={styles.content}>
-        
-        <TouchableOpacity style={styles.actionButton}>
-          <MaterialCommunityIcons name="fingerprint" size={30} color="#ac0808" />
-          <Text style={styles.actionLabel}>Clock In/Out</Text>
-        </TouchableOpacity>
+        <View style={styles.content}>
 
-        <TouchableOpacity style={styles.actionButton}>
-          <MaterialIcons name="report-problem" size={30} color="#ac0808" />
-          <Text style={styles.actionLabel}>Report Found/Lost Item</Text>
-        </TouchableOpacity>
-      </View >
-        
+          <TouchableOpacity style={styles.actionButton}
+          onPress={() => navigation.navigate("Clock In/Out")}
+      >
+            <MaterialCommunityIcons name="fingerprint" size={30} color="#ac0808" />
+            <Text style={styles.actionLabel}>Clock In/Out</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.actionButton}
+            onPress={() => navigation.navigate("Report Found/Lost Item")}>
+            <MaterialIcons name="report-problem" size={30} color="#ac0808" />
+            <Text style={styles.actionLabel}>Report Found/Lost Item</Text>
+          </TouchableOpacity>
+        </View >
+
       </View>
     </ImageBackground>
   );
@@ -55,27 +63,14 @@ function HomeScreen() {
 
 
 
-function ReportFoundLostScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Report Found/Lost Item Screen</Text>
-    </View>
-  );
-}
 
-function LogoutScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Logout Screen</Text>
-    </View>
-  );
-}
+
 
 export default function App() {
   const screens = [
     { name: "Home", component: HomeScreen, title: "Home" },
     { name: "Clock In/Out", component: ClockInOutScreen, title: "Clock In/Out" },
-    { name: "Report Found/Lost Item", component: ReportFoundLostScreen, title: "Report Found/Lost Item" },
+    { name: "Report Found/Lost Item", component: ReportScreen, title: "Report Found/Lost Item" },
     { name: "Logout", component: LogoutScreen, title: "Logout" },
   ];
 
@@ -117,7 +112,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginVertical: 30,
     width: "85%",
-    height: height * 0.35, 
+    height: height * 0.35,
   },
   avatarWrapper: {
     marginRight: 15,
@@ -143,14 +138,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     marginTop: 5,
   },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "100%",
-    paddingHorizontal: 20,
-    alignItems: "center",
-    marginBottom: 120,
-  },
+ 
   actionButton: {
     flexDirection: "row",
     alignItems: "center",

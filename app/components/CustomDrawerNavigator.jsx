@@ -12,7 +12,7 @@ export default function CustomDrawerNavigator({ screens }) {
       initialRouteName="Home"
       screenOptions={{
         drawerStyle: {
-          backgroundColor: "rgba(39, 39, 39, 0.5)",
+          backgroundColor: "rgba(0, 0, 0, 0.8)",
           width: 250,
         },
         overlayColor: "transparent",
@@ -36,9 +36,36 @@ export default function CustomDrawerNavigator({ screens }) {
           component={screen.component}
           options={{
             title: screen.title,
-            headerTitle: screen.headerTitle || screen.title,
+            headerTitle: () => (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  position: "absolute",
+                  left: "50%",
+                  transform: [{ translateX: -80 }],
+                }}
+              >
+                <Image
+                  source={require("../../assets/images/iti-logo.png")}
+                  style={{ width: 100, height: 40, marginRight: -32 }}
+                  resizeMode="contain"
+                />
+                <Text
+                  style={{
+                    fontSize: width * 0.04,
+                    fontWeight: "bold",
+                    marginLeft: -5,
+                    alignSelf: "flex-end",
+                  }}
+                >
+                  -TrackIt
+                </Text>
+              </View>
+            ),
             headerRight: () => (
-              <TouchableOpacity onPress={() => alert("Notifications!")}>
+              <TouchableOpacity onPress={screen.onNotificationPress || (() => alert("Notifications!"))}>
                 <Ionicons
                   name="notifications-outline"
                   size={25}
