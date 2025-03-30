@@ -1,10 +1,12 @@
-import { useSignIn } from '@clerk/clerk-expo'
 import { Link, useRouter } from 'expo-router'
 import { Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 
 export default function Page() {
-  const { signIn, setActive, isLoaded } = useSignIn()
+  // TODO implement signIn here
+  const signIn = false
+  const setActive = false
+  const isLoaded = false
   const router = useRouter()
 
   const [emailAddress, setEmailAddress] = React.useState('')
@@ -32,7 +34,6 @@ export default function Page() {
         console.error(JSON.stringify(signInAttempt, null, 2))
       }
     } catch (err) {
-      // See https://clerk.com/docs/custom-flows/error-handling
       // for more info on error handling
       console.error(JSON.stringify(err, null, 2))
     }
