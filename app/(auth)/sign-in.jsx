@@ -1,12 +1,19 @@
 import { Link, useRouter } from 'expo-router'
 import { Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React from 'react'
+import { useLoadingStore, useAuthStore } from '../../store'
+import axiosBackendInstance from '../../api/axios'
+import * as storage from 'expo-secure-store'
+import axios from 'axios'
+import { set } from 'react-hook-form'
 
 export default function Page() {
   // TODO implement signIn here
-  const signIn = false
+  
   const setActive = false
-  const isLoaded = false
+  const { isLoaded, setLoading } = useLoadingStore((state) => state)
+  const setUser = useAuthStore((state => state.setUser))
+  const user = useAuthStore((state => state.user))
   const router = useRouter()
 
   const [emailAddress, setEmailAddress] = React.useState('')
@@ -14,30 +21,43 @@ export default function Page() {
 
   // Handle the submission of the sign-in form
   const onSignInPress = async () => {
-    if (!isLoaded) return
 
-    // Start the sign-in process using the email and password provided
-    try {
-      const signInAttempt = await signIn.create({
-        identifier: emailAddress,
-        password,
+    setLoading(true)
+
+    // axios.head('http://192.168.1.115:8000/api/v1/auth/jwt/create/')
+    // .then((response) => {
+    //   console.log(response.data)
+    // })
+    // .catch((error) => {
+    //   console.error(error)
+    // })
+
+
+    axiosBackendInstance.post('api/v1/accounts/auth/jwt/create/', {
+      email: emailAddress,
+      password,
+    })
+      .then((response) => {
+        console.log(response.data)
+        // DONE set token in storage
+        storage.setItem('token', response.data.access)
+        return axiosBackendInstance.get('api/v1/accounts/auth/users/me/')
+
+      }).then((response)=>{
+        console.log(response.data)
+        setUser(response.data.first_name)
       })
-
-      // If sign-in process is complete, set the created session as active
-      // and redirect the user
-      if (signInAttempt.status === 'complete') {
-        await setActive({ session: signInAttempt.createdSessionId })
+      .catch((error) => {
+        console.error(error)
+        // TODO handle error
+      }).finally(() => {
+        console.log(user)
+        setLoading(false)
         router.replace('/')
-      } else {
-        // If the status isn't complete, check why. User might need to
-        // complete further steps.
-        console.error(JSON.stringify(signInAttempt, null, 2))
-      }
-    } catch (err) {
-      // for more info on error handling
-      console.error(JSON.stringify(err, null, 2))
+
+      })
     }
-  }
+  
 
   return (
     <View>
