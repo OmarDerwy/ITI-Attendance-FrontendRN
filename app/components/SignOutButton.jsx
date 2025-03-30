@@ -1,19 +1,27 @@
 import * as Linking from 'expo-linking'
-import { Text, TouchableOpacity } from 'react-native'
+import { Text, TouchableOpacity, StyleSheet} from 'react-native'
+import { COLORS, FONT_SIZES } from '../constants/theme'
+import { View } from 'react-native';
 
 export const SignOutButton = () => {
-  
-  const handleSignOut = async () => {
-    // Call the signOut function to sign the user out
-    // await signOut()
-
-    // Redirect the user to the sign-in page
-    // Linking.openURL('/(auth)/sign-in')
-  }
-
   return (
-    <TouchableOpacity onPress={handleSignOut}>
+    <View style={styles.button} >
       <Text>Sign out</Text>
-    </TouchableOpacity>
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+    button:{
+        backgroundColor: COLORS.red,
+        padding: 20,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        margin: 10
+    },
+    buttonFont: {
+        color: 'white',
+        fontSize: FONT_SIZES.large,
+    }
+})
