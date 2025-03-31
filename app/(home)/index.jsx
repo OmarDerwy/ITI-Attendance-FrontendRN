@@ -1,4 +1,3 @@
-import { Link } from 'expo-router'
 import { Text, View, Image, Dimensions, StyleSheet } from 'react-native'
 // import { SignOutButton } from '@/app/components/SignOutButton'
 import Sandbox from '@/app/components/Sandbox'
@@ -30,7 +29,7 @@ export default function Page() {
           </View>
           <View style={styles.buttonContainer}>
             <View style={styles.buttonWrapper}>
-              <CustomButton text="Sign In" color={COLORS.red} fontSize={FONT_SIZES.large} />
+              <CustomButton text="Sign In" color={COLORS.red} fontSize={FONT_SIZES.large} path={'/(auth)/sign-in'} />
             </View>
           </View>
         </View>
