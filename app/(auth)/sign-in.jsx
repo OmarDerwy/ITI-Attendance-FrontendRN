@@ -19,11 +19,11 @@ export default function Page() {
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
 
-  // Handle the submission of the sign-in form
+  //DONE Handle the submission of the sign-in form
   const onSignInPress = async () => {
 
     setLoading(true)
-
+    // TODO put a nice loading screen when fetching the jwt
     axiosBackendInstance.post('api/v1/accounts/auth/jwt/create/', {
       email: emailAddress,
       password,
