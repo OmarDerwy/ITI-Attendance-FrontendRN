@@ -1,5 +1,5 @@
 import { Link, useRouter } from 'expo-router'
-import { Text, TextInput, TouchableOpacity, View, Image, StyleSheet, Dimensions } from 'react-native'
+import { Text, TextInput, TouchableOpacity, View, Image, StyleSheet, Dimensions, Modal } from 'react-native'
 import React from 'react'
 import { useLoadingStore, useAuthStore } from '../../store'
 import axiosBackendInstance from '../../api/axios'
@@ -57,26 +57,28 @@ export default function Page() {
           style={styles.image}
         />
       </View>
-      <View style={styles.formContainer}>
-        <Text style={styles.title}>Sign in</Text>
-        <TextInput
-          style={styles.input}
-          autoCapitalize="none"
-          value={emailAddress}
-          placeholder="Enter email"
-          onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
-        />
-        <TextInput
-          style={styles.input}
-          value={password}
-          placeholder="Enter password"
-          secureTextEntry={true}
-          onChangeText={(password) => setPassword(password)}
-        />
-        <View style={styles.button}>
-          <CustomButton text="Continue" color={COLORS.red} fontSize={FONT_SIZES.medium} buttonHandler={onSignInPress} />
+      <Modal visible={true} transparent={true} animationType="slide">
+        <View style={styles.modalView}>
+          <Text style={styles.title}>Sign in</Text>
+          <TextInput
+            style={styles.input}
+            autoCapitalize="none"
+            value={emailAddress}
+            placeholder="Enter email"
+            onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
+          />
+          <TextInput
+            style={styles.input}
+            value={password}
+            placeholder="Enter password"
+            secureTextEntry={true}
+            onChangeText={(password) => setPassword(password)}
+          />
+          <View style={styles.button}>
+            <CustomButton text="Continue" color={COLORS.red} fontSize={FONT_SIZES.medium} buttonHandler={onSignInPress} />
+          </View>
         </View>
-      </View>
+      </Modal>
     </View>
   )
 }
@@ -90,7 +92,7 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     alignItems: 'flex-start',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
     flex: 1.5,
     backgroundColor: 'white',
   },
@@ -98,15 +100,17 @@ const styles = StyleSheet.create({
     width: width,
     height: 400,
   },
-  formContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+  modalView: {
+    position: 'absolute',
+    bottom: 0,
+    height: '40%',
+    width: width,
+    backgroundColor: '#dddddd',
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
-    backgroundColor: '#dddddd',
-    width: width,
     padding: 20,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
   },
   title: {
     fontSize: 24,
