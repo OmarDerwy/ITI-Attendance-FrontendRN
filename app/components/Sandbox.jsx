@@ -3,7 +3,7 @@ import React from 'react'
 import CustomButton from './CustomButton'
 import * as storage from 'expo-secure-store'
 import { useAuthStore } from '../../store/index'
-import { COLORS } from '../constants/theme'
+import { COLORS, FONT_SIZES } from '../constants/theme'
 export default function Sandbox() {
   const setUser = useAuthStore((state) => state.setUser)
   const handleSignOut = () => {
@@ -13,7 +13,7 @@ export default function Sandbox() {
   }
   return (
     <Pressable onPress={handleSignOut}>
-      <CustomButton text="Sign Out" color={COLORS.red} />
+      <CustomButton text="Sign Out" color={COLORS.red} fontSize={FONT_SIZES.large} buttonHandler={handleSignOut} />
     </Pressable>
   )
 }
