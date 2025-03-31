@@ -1,8 +1,9 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { SignOutButton } from './SignOutButton'
+import CustomButton from './CustomButton'
 import * as storage from 'expo-secure-store'
 import { useAuthStore } from '../../store/index'
+import { COLORS } from '../constants/theme'
 export default function Sandbox() {
   const setUser = useAuthStore((state) => state.setUser)
   const handleSignOut = () => {
@@ -12,7 +13,7 @@ export default function Sandbox() {
   }
   return (
     <Pressable onPress={handleSignOut}>
-      <SignOutButton/>
+      <CustomButton text="Sign Out" color={COLORS.red} />
     </Pressable>
   )
 }

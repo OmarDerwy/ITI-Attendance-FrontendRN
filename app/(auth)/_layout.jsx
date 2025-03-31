@@ -1,7 +1,8 @@
 import { Redirect, Stack } from 'expo-router'
-// TODO use isSignedIn here
+import { useAuthStore } from '@/store/index';
+
 export default function AuthRoutesLayout() {
-  const isSignedIn = false 
+  const { isSignedIn } = useAuthStore((state) => state.isSignedIn)
   if (isSignedIn) {
     return <Redirect href={'/'} />
   }
