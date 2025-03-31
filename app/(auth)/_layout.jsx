@@ -7,5 +7,9 @@ export default function AuthRoutesLayout() {
     return <Redirect href={'/'} />
   }
 
-  return <Stack />
+  return(
+  <Stack screenOptions={{animation: 'slide_from_right'}}>
+    <Stack.Screen name="sign-in" options={{ headerShown: false }} />
+  </Stack>
+  )
 }

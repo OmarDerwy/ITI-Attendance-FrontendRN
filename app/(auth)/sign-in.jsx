@@ -1,9 +1,13 @@
 import { Link, useRouter } from 'expo-router'
-import { Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Text, TextInput, TouchableOpacity, View, Image, StyleSheet, Dimensions } from 'react-native'
 import React from 'react'
 import { useLoadingStore, useAuthStore } from '../../store'
 import axiosBackendInstance from '../../api/axios'
 import * as storage from 'expo-secure-store'
+import CustomButton from '../components/CustomButton'
+import { COLORS, FONT_SIZES } from '../constants/theme'
+
+const { width } = Dimensions.get('window')
 
 export default function Page() {  
 
@@ -46,29 +50,91 @@ export default function Page() {
   
 
   return (
-    <View>
-      <Text>Sign in</Text>
-      <TextInput
-        autoCapitalize="none"
-        value={emailAddress}
-        placeholder="Enter email"
-        onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
-      />
-      <TextInput
-        value={password}
-        placeholder="Enter password"
-        secureTextEntry={true}
-        onChangeText={(password) => setPassword(password)}
-      />
-      <TouchableOpacity onPress={onSignInPress}>
-        <Text>Continue</Text>
-      </TouchableOpacity>
-      <View style={{ display: 'flex', flexDirection: 'row', gap: 3 }}>
-        <Text>Don't have an account?</Text>
-        <Link href="/sign-up">
-          <Text>Sign up</Text>
-        </Link>
+    <View style={styles.page}>
+      <View style={styles.imageContainer}>
+        <Image
+          source={require('@/assets/images/ColoredLogobanner1to1.png')}
+          style={styles.image}
+        />
+      </View>
+      <View style={styles.formContainer}>
+        <Text style={styles.title}>Sign in</Text>
+        <TextInput
+          style={styles.input}
+          autoCapitalize="none"
+          value={emailAddress}
+          placeholder="Enter email"
+          onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
+        />
+        <TextInput
+          style={styles.input}
+          value={password}
+          placeholder="Enter password"
+          secureTextEntry={true}
+          onChangeText={(password) => setPassword(password)}
+        />
+        <View style={styles.button}>
+          <CustomButton text="Continue" color={COLORS.red} fontSize={FONT_SIZES.medium} buttonHandler={onSignInPress} />
+        </View>
       </View>
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  page: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
+  imageContainer: {
+    alignItems: 'flex-start',
+    justifyContent: 'flex-end',
+    flex: 1.5,
+    backgroundColor: 'white',
+  },
+  image: {
+    width: width,
+    height: 400,
+  },
+  formContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
+    backgroundColor: '#dddddd',
+    width: width,
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  input: {
+    width: '100%',
+    height: 50,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+  },
+  button: {
+    width: '80%',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  linkContainer: {
+    flexDirection: 'row',
+    gap: 3,
+  },
+  link: {
+    color: '#0000ff',
+    textDecorationLine: 'underline',
+  },
+})

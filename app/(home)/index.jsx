@@ -3,13 +3,18 @@ import { Text, View, Image, Dimensions, StyleSheet } from 'react-native'
 import Sandbox from '@/app/components/Sandbox'
 import { useAuthStore } from '@/store/index'
 import CustomButton from '../components/CustomButton'
-import { COLORS, FONT_SIZES } from '../constants/theme'
+import { COLORS, FONT_SIZES, FONT_WEIGHTS } from '../constants/theme'
+import { useRouter } from 'expo-router'
 
 const { width } = Dimensions.get('window')
 
 export default function Page() {
   const isSignedIn = useAuthStore((state) => state.isSignedIn)
   const user = useAuthStore((state) => state.user)
+  const router = useRouter()
+  const handleNavigateToSignIn = () => {
+    router.push('/sign-in')
+  }
    // DONE implement signedIn here
   console.log(isSignedIn)
   return (
@@ -28,8 +33,9 @@ export default function Page() {
             />
           </View>
           <View style={styles.buttonContainer}>
+            <Text style={styles.text}>Welcome the ITI official app! Please note that you need to be a current student in order to proceed ✌️</Text>
             <View style={styles.buttonWrapper}>
-              <CustomButton text="Sign In" color={COLORS.red} fontSize={FONT_SIZES.large} path={'/(auth)/sign-in'} />
+              <CustomButton text="Sign In" color={COLORS.red} fontSize={FONT_SIZES.large} buttonHandler={handleNavigateToSignIn} />
             </View>
           </View>
         </View>
@@ -77,7 +83,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   text: {
-    fontSize: 20,
+    fontSize: FONT_SIZES.large,
     marginBottom: 20,
+    textAlign: 'center',
+    fontWeight: FONT_WEIGHTS.medium,
   },
 })

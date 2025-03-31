@@ -3,13 +3,13 @@ import { FONT_SIZES, COLORS } from '../constants/theme'
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 
-export const CustomButton = ({ text, color, fontSize, path }) => {
+export const CustomButton = ({ text, color, fontSize, buttonHandler }) => {
   const router = useRouter()
   const styles = dynamicColor(color, fontSize)
   return (
     // <View style={styles.buttonContainer}>
       <View style={styles.buttonContainer}>
-        <Pressable style={styles.buttonBody} onPress={() => router.push(path)} android_ripple={{color: 'darkred'}}>
+        <Pressable style={styles.buttonBody} onPress={buttonHandler} android_ripple={{color: 'darkred'}}>
           <Text style={styles.buttonFont}>{text}</Text>
         </Pressable>
       </View>
