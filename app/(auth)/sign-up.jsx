@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { Link, useRouter } from 'expo-router'
-// TODO implement signUp here
 export default function SignUpScreen() {
   const router = useRouter()
   const signUp = false

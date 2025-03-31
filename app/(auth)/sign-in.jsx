@@ -4,13 +4,9 @@ import React from 'react'
 import { useLoadingStore, useAuthStore } from '../../store'
 import axiosBackendInstance from '../../api/axios'
 import * as storage from 'expo-secure-store'
-import axios from 'axios'
-import { set } from 'react-hook-form'
 
-export default function Page() {
-  // TODO implement signIn here
-  
-  const setActive = false
+export default function Page() {  
+
   const { isLoaded, setLoading } = useLoadingStore((state) => state)
   const setUser = useAuthStore((state => state.setUser))
   const user = useAuthStore((state => state.user))
@@ -23,15 +19,6 @@ export default function Page() {
   const onSignInPress = async () => {
 
     setLoading(true)
-
-    // axios.head('http://192.168.1.115:8000/api/v1/auth/jwt/create/')
-    // .then((response) => {
-    //   console.log(response.data)
-    // })
-    // .catch((error) => {
-    //   console.error(error)
-    // })
-
 
     axiosBackendInstance.post('api/v1/accounts/auth/jwt/create/', {
       email: emailAddress,
@@ -49,7 +36,6 @@ export default function Page() {
       })
       .catch((error) => {
         console.error(error)
-        // TODO handle error
       }).finally(() => {
         console.log(user)
         setLoading(false)
