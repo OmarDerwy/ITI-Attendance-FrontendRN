@@ -1,12 +1,13 @@
-import { Stack } from 'expo-router';
-
-
-
+import { Stack } from "expo-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+// DONE implement some form of caching and state management
+const queryClient = new QueryClient();
 export default function RootLayout() {
   return (
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="home/index" options={{ headerShown: false }} />
-      </Stack>
+      <QueryClientProvider client={queryClient}>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index"/>
+        </Stack>
+      </QueryClientProvider>
   );
 }

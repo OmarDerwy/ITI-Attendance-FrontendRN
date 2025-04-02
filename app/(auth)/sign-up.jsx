@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { Text, TextInput, TouchableOpacity, View } from 'react-native'
-import { useSignUp } from '@clerk/clerk-expo'
 import { Link, useRouter } from 'expo-router'
-
 export default function SignUpScreen() {
-  const { isLoaded, signUp, setActive } = useSignUp()
   const router = useRouter()
+  const signUp = false
+  const setActive = false
+  const isLoaded = false
 
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
