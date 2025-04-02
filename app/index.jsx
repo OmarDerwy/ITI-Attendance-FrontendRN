@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
-import { View, Text, Image, Dimensions, ActivityIndicator } from "react-native";
+import { View, Text, Image, Dimensions } from "react-native";
 import { useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 
 const { width, height } = Dimensions.get("window");
 
@@ -9,21 +8,16 @@ export default function WelcomeScreen() {
   const router = useRouter();
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const waitForSplash = async () => {
       await new Promise((resolve) => setTimeout(resolve, 2000)); //for some delay for the splash screen
 
-      // Check if the user is logged in (e.g., token exists in SecureStore)
-      const token = await SecureStore.getItemAsync("authToken"); //using expo-secure-store to store authentication tokens
-
       if (true) {
-        router.replace('/home');
-      } else {
-        router.replace("/auth/sign-in");
+        router.replace('(home)');
       }
       return null;
     };
 
-    checkAuth();
+    waitForSplash();
   }, []);
 
   return (

@@ -11,7 +11,7 @@ import {
   Dimensions
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import CustomDrawerNavigator from "../components/CustomDrawerNavigator";
+import CustomDrawerNavigator from "../../components/CustomDrawerNavigator";
 import ClockInOutScreen from "../attendance";
 import ReportScreen from "../report";
 import LogoutScreen from "../logout";
@@ -25,7 +25,7 @@ function HomeScreen({ navigation }) {
 
   return (
     <ImageBackground
-      source={require("../../assets/images/home-bg.webp")}
+      source={require("../../../assets/images/home-bg.webp")}
       style={styles.background}
     >
       <View style={styles.overlay}>
