@@ -115,7 +115,7 @@ export default function ReportScreen() {
       const response = await axios(apiEndpoint, {
         method: "POST",
         headers: {
-          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ0MTU3MDc0LCJpYXQiOjE3NDM1NTIyNzQsImp0aSI6IjkyMjRmMWIzOGJmMzRiNjc5NjVmZWM4ZDdmNThmYmE1IiwidXNlcl9pZCI6MzR9.smLuwEa5heF0l8G-3q1S5pqxX43MW8-TvYbjjDd1ZDs`,
+          Authorization: `Bearer token`,
           "Content-Type": "multipart/form-data",
         },
         data: formData,
