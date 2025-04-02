@@ -32,7 +32,7 @@ export default function ClockInOutScreen() {
     try {
       const response = await axios.get(`${BASE_URL}attendance/status/`, {
         headers: {
-          "Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ0MTU3MDc0LCJpYXQiOjE3NDM1NTIyNzQsImp0aSI6IjkyMjRmMWIzOGJmMzRiNjc5NjVmZWM4ZDdmNThmYmE1IiwidXNlcl9pZCI6MzR9.smLuwEa5heF0l8G-3q1S5pqxX43MW8-TvYbjjDd1ZDs`,
+          "Authorization": `Bearer token`,
         },
       });
 
@@ -97,9 +97,8 @@ export default function ClockInOutScreen() {
     const location = await getLocation();
     if (!location) return;
 
-//     const { latitude, longitude } = location.coords;
-    const latitude = 29.9929; // Replace with actual latitude
-    const longitude = 31.6049; // Replace with actual longitude
+    const { latitude, longitude } = location.coords;
+   
 
     console.log("Sending:", {
       user_id: 34,
@@ -120,7 +119,7 @@ export default function ClockInOutScreen() {
         {
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ0MTU3MDc0LCJpYXQiOjE3NDM1NTIyNzQsImp0aSI6IjkyMjRmMWIzOGJmMzRiNjc5NjVmZWM4ZDdmNThmYmE1IiwidXNlcl9pZCI6MzR9.smLuwEa5heF0l8G-3q1S5pqxX43MW8-TvYbjjDd1ZDs`,
+            "Authorization": `Bearer token`,
           },
         }
       );
