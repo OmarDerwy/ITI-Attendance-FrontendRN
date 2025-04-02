@@ -1,67 +1,144 @@
-import { useSignIn } from '@clerk/clerk-expo'
 import { Link, useRouter } from 'expo-router'
-import { Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Text, TextInput, TouchableOpacity, View, Image, StyleSheet, Dimensions, Modal } from 'react-native'
 import React from 'react'
+import { useLoadingStore, useAuthStore } from '../../store'
+import axiosBackendInstance from '../../api/axios'
+import * as storage from 'expo-secure-store'
+import CustomButton from '../components/CustomButton'
+import { COLORS, FONT_SIZES } from '../constants/theme'
 
-export default function Page() {
-  const { signIn, setActive, isLoaded } = useSignIn()
+const { width } = Dimensions.get('window')
+
+export default function Page() {  
+
+  const { isLoaded, setLoading } = useLoadingStore((state) => state)
+  const setUser = useAuthStore((state => state.setUser))
+  const user = useAuthStore((state => state.user))
   const router = useRouter()
 
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
 
-  // Handle the submission of the sign-in form
+  //DONE Handle the submission of the sign-in form
   const onSignInPress = async () => {
-    if (!isLoaded) return
 
-    // Start the sign-in process using the email and password provided
-    try {
-      const signInAttempt = await signIn.create({
-        identifier: emailAddress,
-        password,
+    setLoading(true)
+    // TODO put a nice loading screen when fetching the jwt
+    axiosBackendInstance.post('api/v1/accounts/auth/jwt/create/', {
+      email: emailAddress,
+      password,
+    })
+      .then((response) => {
+        console.log(response.data)
+        // DONE set token in storage
+        storage.setItem('token', response.data.access)
+        return axiosBackendInstance.get('api/v1/accounts/auth/users/me/')
+
+      }).then((response)=>{
+        console.log(response.data)
+        setUser(response.data.first_name)
       })
-
-      // If sign-in process is complete, set the created session as active
-      // and redirect the user
-      if (signInAttempt.status === 'complete') {
-        await setActive({ session: signInAttempt.createdSessionId })
+      .catch((error) => {
+        console.error(error)
+      }).finally(() => {
+        console.log(user)
+        setLoading(false)
         router.replace('/')
-      } else {
-        // If the status isn't complete, check why. User might need to
-        // complete further steps.
-        console.error(JSON.stringify(signInAttempt, null, 2))
-      }
-    } catch (err) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
-      console.error(JSON.stringify(err, null, 2))
+
+      })
     }
-  }
+  
 
   return (
-    <View>
-      <Text>Sign in</Text>
-      <TextInput
-        autoCapitalize="none"
-        value={emailAddress}
-        placeholder="Enter email"
-        onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
-      />
-      <TextInput
-        value={password}
-        placeholder="Enter password"
-        secureTextEntry={true}
-        onChangeText={(password) => setPassword(password)}
-      />
-      <TouchableOpacity onPress={onSignInPress}>
-        <Text>Continue</Text>
-      </TouchableOpacity>
-      <View style={{ display: 'flex', flexDirection: 'row', gap: 3 }}>
-        <Text>Don't have an account?</Text>
-        <Link href="/sign-up">
-          <Text>Sign up</Text>
-        </Link>
+    <View style={styles.page}>
+      <View style={styles.imageContainer}>
+        <Image
+          source={require('@/assets/images/ColoredLogobanner1to1.png')}
+          style={styles.image}
+        />
       </View>
+      <Modal visible={true} transparent={true} animationType="slide">
+        <View style={styles.modalView}>
+          <Text style={styles.title}>Sign in</Text>
+          <TextInput
+            style={styles.input}
+            autoCapitalize="none"
+            value={emailAddress}
+            placeholder="Enter email"
+            onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
+          />
+          <TextInput
+            style={styles.input}
+            value={password}
+            placeholder="Enter password"
+            secureTextEntry={true}
+            onChangeText={(password) => setPassword(password)}
+          />
+          <View style={styles.button}>
+            <CustomButton text="Continue" color={COLORS.red} fontSize={FONT_SIZES.medium} buttonHandler={onSignInPress} />
+          </View>
+        </View>
+      </Modal>
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  page: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
+  imageContainer: {
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+    flex: 1.5,
+    backgroundColor: 'white',
+  },
+  image: {
+    width: width,
+    height: 400,
+  },
+  modalView: {
+    position: 'absolute',
+    bottom: 0,
+    height: '40%',
+    width: width,
+    backgroundColor: '#dddddd',
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
+    padding: 20,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  input: {
+    width: '100%',
+    height: 50,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+  },
+  button: {
+    width: '80%',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  linkContainer: {
+    flexDirection: 'row',
+    gap: 3,
+  },
+  link: {
+    color: '#0000ff',
+    textDecorationLine: 'underline',
+  },
+})

@@ -22,4 +22,12 @@ const FONT_SIZES = {
     xxlarge: PixelRatio.getFontScale() * 28
 };
 
-export { COLORS , SIZES, FONT_SIZES };
+const FONT_WEIGHTS = {
+    light: '200',
+    regular: '400',
+    medium: '500',
+    bold: '700',
+    black: '900'
+};
+
+export { COLORS , SIZES, FONT_SIZES, FONT_WEIGHTS };

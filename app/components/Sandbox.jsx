@@ -1,12 +1,20 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import GetStarted from './auth/GetStarted'
+import CustomButton from './CustomButton'
+import * as storage from 'expo-secure-store'
+import { useAuthStore } from '../../store/index'
+import { COLORS, FONT_SIZES } from '../constants/theme'
 export default function Sandbox() {
+  const setUser = useAuthStore((state) => state.setUser)
+  const handleSignOut = () => {
+     storage.setItem('token', "")
+     setUser(null)
+     console.log('signed out')
+  }
   return (
-    <View>
-      <GetStarted />
-    </View>
+    <Pressable onPress={handleSignOut}>
+      <CustomButton text="Sign Out" color={COLORS.red} fontSize={FONT_SIZES.large} buttonHandler={handleSignOut} />
+    </Pressable>
   )
 }
 
-const styles = StyleSheet.create({})

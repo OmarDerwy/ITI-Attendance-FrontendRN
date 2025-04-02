@@ -16,7 +16,6 @@
     "preset": "jest-expo"
   },
   "dependencies": {
-    "@clerk/clerk-expo": "^2.9.3",
     "@expo/vector-icons": "^14.0.2",
     "@react-native-community/masked-view": "^0.1.11",
     "@react-native-picker/picker": "^2.11.0",
@@ -52,7 +51,6 @@
     "react-native": "0.76.7",
     "react-native-drawer-layout": "^4.1.2",
     "react-native-gesture-handler": "~2.20.2",
-    "react-native-mmkv": "^3.2.0",
     "react-native-pager-view": "^6.7.0",
     "react-native-reanimated": "~3.16.1",
     "react-native-safe-area-context": "^4.14.1",
