@@ -4,7 +4,7 @@ import Sandbox from '@/app/components/Sandbox'
 import { useAuthStore } from '@/store/index'
 import CustomButton from '../components/CustomButton'
 import { COLORS, FONT_SIZES, FONT_WEIGHTS } from '../constants/theme'
-import { useRouter } from 'expo-router'
+import { Redirect, useRouter } from 'expo-router'
 
 const { width } = Dimensions.get('window')
 
@@ -20,10 +20,7 @@ export default function Page() {
   return (
     <View style={styles.page}>
       {isSignedIn ? (
-        <View>
-          <Text style={styles.welcomeText}>Welcome, {user}!</Text>
-          <Sandbox />
-        </View>
+        <Redirect href="/(home)/home" />
       ) : (
         <View style={styles.container}>
           <View style={styles.imageContainer}>

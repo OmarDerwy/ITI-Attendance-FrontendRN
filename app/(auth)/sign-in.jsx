@@ -43,7 +43,7 @@ export default function Page() {
       }).finally(() => {
         console.log(user)
         setLoading(false)
-        router.replace('/')
+        router.replace('/(home)/')  // Fix the path format
 
       })
     }
