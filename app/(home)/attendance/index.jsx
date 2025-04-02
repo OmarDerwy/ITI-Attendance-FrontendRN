@@ -99,7 +99,7 @@ export default function ClockInOutScreen() {
    
 
     console.log("Sending:", {
-      user_id: 34,
+      user_id: 1,
       uuid: deviceUUID,
       latitude,
       longitude,
