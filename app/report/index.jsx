@@ -115,7 +115,7 @@ export default function ReportScreen() {
       const response = await axios(apiEndpoint, {
         method: "POST",
         headers: {
-          Authorization: `Bearer YOUR_TOKEN_HERE`,
+          Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ0MTU3MDc0LCJpYXQiOjE3NDM1NTIyNzQsImp0aSI6IjkyMjRmMWIzOGJmMzRiNjc5NjVmZWM4ZDdmNThmYmE1IiwidXNlcl9pZCI6MzR9.smLuwEa5heF0l8G-3q1S5pqxX43MW8-TvYbjjDd1ZDs`,
           "Content-Type": "multipart/form-data",
         },
         data: formData,
@@ -128,7 +128,7 @@ export default function ReportScreen() {
         setPlace("");
         setStatus("LOST");
         setImage(null);
-        setTime(new Date()); // Reset the time field
+        // setTime(new Date()); 
       } else {
         Alert.alert("Error", `Failed to report the item: ${response.statusText}`);
       }
@@ -198,7 +198,7 @@ export default function ReportScreen() {
         </View>
       </Modal>
 
-      {/* Time Picker */}
+      {/*
       <TouchableOpacity
         style={styles.timePickerButton}
         onPress={() => setShowTimePicker(true)}
@@ -214,7 +214,7 @@ export default function ReportScreen() {
           display="default"
           onChange={handleTimeChange}
         />
-      )}
+      )} */}
 
       <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
         <Text style={styles.imagePickerText}>Pick an Image</Text>
