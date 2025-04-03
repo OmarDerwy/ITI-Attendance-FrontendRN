@@ -32,14 +32,37 @@ export default function Page() {
       await storage.setItem('access_token', authResponse.data.access);
       await storage.setItem('refresh_token', authResponse.data.refresh);
       
-      // Get user data
-      const userResponse = await axiosBackendInstance.get('api/v1/accounts/auth/users/me/');
-      
-      // Update user state with all returned data
-      setUser(userResponse.data);
-      
-      // Navigate to home
-      router.replace('/(home)/');
+      try {
+        // Get user data with better error handling
+        const userResponse = await axiosBackendInstance.get('api/v1/accounts/auth/users/me/');
+        
+        // Ensure we have valid user data before updating state
+        if (userResponse && userResponse.data) {
+          // Update user state with all returned data
+          setUser(userResponse.data);
+        } else {
+          // Handle missing user data
+          setUser({
+            username: emailAddress,
+            email: emailAddress,
+            first_name: '',
+            last_name: '',
+            role: 'student'
+          });
+        }
+        
+        // Navigate to home
+        router.replace('/(home)/');
+      } catch (userError) {
+        console.error('Error fetching user data:', userError);
+        // Even if user data fetch fails, we're still authenticated
+        // Set minimal user data
+        setUser({
+          email: emailAddress,
+          username: emailAddress
+        });
+        router.replace('/(home)/');
+      }
     } catch (error) {
       console.error('Authentication error:', error);
       Alert.alert(

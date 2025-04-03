@@ -7,20 +7,30 @@ export const useAuthStore = create((set) => ({
   email: '',
   first_name: '',
   last_name: '',
-  role: '',
+  role: 'student',
   
-  setUser: (userData) => set({
-    isSignedIn: true,
-    username: userData.username || '',
-    email: userData.email || '',
-    first_name: userData.first_name || '',
-    last_name: userData.last_name || '',
-    role: userData.role || 'student', // Default to student if not specified
-  }),
+  setUser: (userData) => {
+    // Ensure userData is an object, even if it's null/undefined
+    const data = userData || {};
+    
+    set({
+      isSignedIn: true,
+      username: data.username || '',
+      email: data.email || '',
+      first_name: data.first_name || '',
+      last_name: data.last_name || '',
+      role: data.role || 'student',
+    });
+  },
   
   clearUser: async () => {
-    await storage.deleteItemAsync('access_token');
-    await storage.deleteItemAsync('refresh_token');
+    try {
+      await storage.deleteItemAsync('access_token');
+      await storage.deleteItemAsync('refresh_token');
+    } catch (error) {
+      console.error('Error clearing tokens:', error);
+    }
+    
     set({
       isSignedIn: false,
       username: '',

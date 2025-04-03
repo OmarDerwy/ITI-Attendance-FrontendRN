@@ -28,8 +28,8 @@ axiosBackendInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     
-    // If the error is 401 and we haven't retried yet
-    if (error.response.status === 401 && !originalRequest._retry) {
+    // Check if error and error response exist before accessing status
+    if (error && error.response && error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       
       try {
@@ -42,12 +42,12 @@ axiosBackendInstance.interceptors.response.use(
         }
         
         // Attempt to refresh token
-        const response = await axiosBackendInstance.post(
-          'api/v1/accounts/auth/jwt/refresh/',
+        const response = await axios.post(
+          `${process.env.EXPO_PUBLIC_BACKEND_URL}/api/v1/accounts/auth/jwt/refresh/`,
           { refresh: refreshToken }
         );
         
-        if (response.status === 200) {
+        if (response && response.status === 200) {
           // Store the new tokens
           await storage.setItem('access_token', response.data.access);
           
