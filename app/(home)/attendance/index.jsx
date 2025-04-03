@@ -94,8 +94,8 @@ export default function ClockInOutScreen() {
     if (!location) return;
 
     // const { latitude, longitude } = location.coords;
-    const latitude = 30.0444;
-    const longitude = 31.2357; 
+    const latitude = 29.9929;
+    const longitude = 31.6049; 
    
 
     console.log("Sending:", {
