@@ -8,6 +8,7 @@ import axios from "axios";
 import { v4 as uuidv4 } from 'uuid';
 import Constants from "expo-constants";
 import Toast from 'react-native-toast-message';
+import axiosBackendInstance from '../../../api/axios'
 
 const { width } = Dimensions.get("window");
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
@@ -22,19 +23,15 @@ export default function ClockInOutScreen() {
   const fetchDeviceUUID = async () => {
     let storedUUID = await SecureStore.getItemAsync("deviceUUID");
     if (!storedUUID) {
-      storedUUID = uuidv4();
+      storedUUID = uuidv4({ random: getRandomBytes(16) });
       await SecureStore.setItemAsync("deviceUUID", storedUUID);
     }
-    setDeviceUUID(storedUUID);
+    setDeviceUUID(storedUUID);    
   };
 
   const fetchUserStatus = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}attendance/status/`, {
-        headers: {
-          "Authorization": `Bearer token`,
-        },
-      });
+      const response = await axiosBackendInstance.get(`api/v1/attendance/status/`);
 
       if (response.data.is_checked_in) {
         setIsCheckInDisabled(true); 
@@ -70,8 +67,7 @@ export default function ClockInOutScreen() {
     updateDateTime();
     const interval = setInterval(updateDateTime, 1000);
     fetchDeviceUUID();
-    fetchUserStatus(); // Fetch user status on component load
-
+    fetchUserStatus(); 
     return () => clearInterval(interval);
   }, []);
 
@@ -97,30 +93,26 @@ export default function ClockInOutScreen() {
     const location = await getLocation();
     if (!location) return;
 
-    const { latitude, longitude } = location.coords;
+    // const { latitude, longitude } = location.coords;
+    const latitude = 29.9929;
+    const longitude = 31.6049; 
    
 
     console.log("Sending:", {
-      user_id: 34,
+      user_id: 1,
       uuid: deviceUUID,
       latitude,
       longitude,
     });
 
     try {
-      const response = await axios.post(
-        `${BASE_URL}attendance/${type}/`,
+      const response = await axiosBackendInstance.post(
+        `api/v1/attendance/${type}/`,
         {
           user_id: 34,
           uuid: deviceUUID,
           latitude,
           longitude,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer token`,
-          },
         }
       );
 
