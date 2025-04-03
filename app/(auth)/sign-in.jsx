@@ -1,5 +1,5 @@
 import { Link, useRouter } from 'expo-router'
-import { Text, TextInput, TouchableOpacity, View, Image, StyleSheet, Dimensions, Modal } from 'react-native'
+import { Text, TextInput, TouchableOpacity, View, Image, StyleSheet, Dimensions, Modal, Alert } from 'react-native'
 import React from 'react'
 import { useLoadingStore, useAuthStore } from '../../store'
 import axiosBackendInstance from '../../api/axios'
@@ -13,42 +13,45 @@ export default function Page() {
 
   const { isLoaded, setLoading } = useLoadingStore((state) => state)
   const setUser = useAuthStore((state => state.setUser))
-  const user = useAuthStore((state => state.user))
   const router = useRouter()
 
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
 
-  //DONE Handle the submission of the sign-in form
   const onSignInPress = async () => {
-
     setLoading(true)
-    // TODO put a nice loading screen when fetching the jwt
-    axiosBackendInstance.post('api/v1/accounts/auth/jwt/create/', {
-      email: emailAddress,
-      password,
-    })
-      .then((response) => {
-        console.log(response.data)
-        // DONE set token in storage
-        storage.setItem('token', response.data.access)
-        return axiosBackendInstance.get('api/v1/accounts/auth/users/me/')
-
-      }).then((response)=>{
-        console.log(response.data)
-        setUser(response.data.first_name)
-      })
-      .catch((error) => {
-        console.error(error)
-      }).finally(() => {
-        console.log(user)
-        setLoading(false)
-        router.replace('/(home)/')  // Fix the path format
-
-      })
+    
+    try {
+      // Get auth tokens
+      const authResponse = await axiosBackendInstance.post('api/v1/accounts/auth/jwt/create/', {
+        email: emailAddress,
+        password,
+      });
+      
+      // Store tokens securely
+      await storage.setItem('access_token', authResponse.data.access);
+      await storage.setItem('refresh_token', authResponse.data.refresh);
+      
+      // Get user data
+      const userResponse = await axiosBackendInstance.get('api/v1/accounts/auth/users/me/');
+      
+      // Update user state with all returned data
+      setUser(userResponse.data);
+      
+      // Navigate to home
+      router.replace('/(home)/');
+    } catch (error) {
+      console.error('Authentication error:', error);
+      Alert.alert(
+        'Sign in failed',
+        'Please check your credentials and try again.',
+        [{ text: 'OK' }]
+      );
+    } finally {
+      setLoading(false);
     }
+  }
   
-
   return (
     <View style={styles.page}>
       <View style={styles.imageContainer}>
