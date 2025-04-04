@@ -8,14 +8,20 @@ import { Redirect, useRouter } from 'expo-router'
 const { width } = Dimensions.get('window')
 
 export default function Page() {
-  const { isSignedIn, first_name, last_name } = useAuthStore((state) => state)
+  const { isSignedIn, first_name, last_name, email } = useAuthStore((state) => state)
   const router = useRouter()
   const handleNavigateToSignIn = () => {
     router.push('/sign-in')
   }
   
-  const fullName = `${first_name} ${last_name}`.trim();
-  const displayName = fullName || 'User';
+  // More robust name display logic
+  let displayName = 'User';
+  if (first_name || last_name) {
+    displayName = `${first_name || ''} ${last_name || ''}`.trim();
+  } else if (email) {
+    // Fall back to email if no name available
+    displayName = email.split('@')[0];
+  }
   
   return (
     <View style={styles.page}>
