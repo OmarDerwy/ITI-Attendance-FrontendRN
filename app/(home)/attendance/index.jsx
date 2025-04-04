@@ -93,17 +93,13 @@ export default function ClockInOutScreen() {
     const location = await getLocation();
     if (!location) return;
 
-    // const { latitude, longitude } = location.coords;
-    const latitude = 29.9929;
-    const longitude = 31.6049; 
-   
-
-    console.log("Sending:", {
-      user_id: 1,
-      uuid: deviceUUID,
-      latitude,
-      longitude,
-    });
+    const { latitude, longitude } = location.coords;
+    // console.log("Sending:", {
+    //   user_id: 1,
+    //   uuid: deviceUUID,
+    //   latitude,
+    //   longitude,
+    // });
 
     try {
       const response = await axiosBackendInstance.post(
