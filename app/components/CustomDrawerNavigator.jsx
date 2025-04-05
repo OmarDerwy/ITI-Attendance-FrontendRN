@@ -1,25 +1,43 @@
 import React, { useState, useEffect } from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import { View, Text, TouchableOpacity, Image, Dimensions, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, Image, Dimensions, StyleSheet, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import useWebSocket from "../hooks/useWebSocket"; // Import the WebSocket hook
+import useWebSocket from "../hooks/useWebSocket";
+import { useNotification } from "../context/NotificationsContext";
 
 const Drawer = createDrawerNavigator();
 const { width } = Dimensions.get("window");
 
 export default function CustomDrawerNavigator({ screens }) {
-  const { messages, isConnected } = useWebSocket("ws://192.168.x.x:8000/ws/notifications/"); // Replace with your server's IP
+  const { messages, isConnected } = useWebSocket("ws://192.168.x.x:8000/ws/notifications/");
   const [unreadCount, setUnreadCount] = useState(0);
+
+  const { notification, expoPushToken, error } = useNotification();
 
   useEffect(() => {
     if (messages?.length > 0) {
-      setUnreadCount((prevCount) => prevCount + 1); // Increment unread count for new messages
+      setUnreadCount((prevCount) => prevCount + 1);
     }
   }, [messages]);
 
+  useEffect(() => {
+    if (notification) {
+      Alert.alert(
+        "New Notification",
+        notification.request.content.title || "You have a new notification!",
+        [
+          {
+            text: "Dismiss",
+            style: "cancel",
+          },
+        ]
+      );
+    }
+  }, [notification]);
+
   const handleNotificationPress = () => {
     alert("Notifications!");
-    setUnreadCount(0); // Reset unread count when the icon is pressed
+    setUnreadCount(0); 
   };
 
   return (
