@@ -133,8 +133,8 @@ export default function ReportScreen() {
 
     const apiEndpoint =
       status === "FOUND"
-        ? process.env.EXPO_PUBLIC_BASE_URL + "lost-and-found/found-items/"
-        : process.env.EXPO_PUBLIC_BASE_URL + "lost-and-found/lost-items/";
+        ? process.env.EXPO_PUBLIC_BACKEND_URL + "lost-and-found/found-items/"
+        : process.env.EXPO_PUBLIC_BACKEND_URL + "lost-and-found/lost-items/";
 
     // console.log("API Endpoint:", apiEndpoint);
     try {
