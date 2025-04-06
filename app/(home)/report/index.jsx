@@ -15,6 +15,8 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons } from "@expo/vector-icons";
 import axios from "axios";
+import axiosBackendInstance from '../../../api/axios'
+
 // import DateTimePicker from "@react-native-community/datetimepicker"; 
 
 const { width } = Dimensions.get("window");
@@ -70,12 +72,12 @@ export default function ReportScreen() {
     setImage(null);
   };
 
-  const handleTimeChange = (event, selectedTime) => {
-    setShowTimePicker(false); // Hide the time picker
-    if (selectedTime) {
-      setTime(selectedTime); // Update the time state
-    }
-  };
+  // const handleTimeChange = (event, selectedTime) => {
+  //   setShowTimePicker(false); // Hide the time picker
+  //   if (selectedTime) {
+  //     setTime(selectedTime); // Update the time state
+  //   }
+  // };
 
   const handleSubmit = async () => {
     if (!name || !description || !place) {
@@ -88,20 +90,45 @@ export default function ReportScreen() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("description", description);
-    formData.append("place", place);
-    formData.append("time", time.toISOString()); // Add time to the form data
-    if (status === "FOUND") {
-      formData.append("status", "FOUND");
-      formData.append("image", {
+    let imageUrl = null;
+
+    if (image) {
+      const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${process.env.EXPO_PUBLIC_CLOUDINARY_NAME}/upload`;
+      const formData = new FormData();
+      formData.append("file", {
         uri: image,
-        name: "item-image.jpg",
         type: "image/jpeg",
+        name: "item-image.jpg",
       });
-    } else {
-      formData.append("status", "LOST");
+      formData.append("upload_preset", process.env.EXPO_PUBLIC_CLOUDINARY_PRESET);
+      formData.append("cloud_name", process.env.EXPO_PUBLIC_CLOUDINARY_NAME);
+
+      try {
+        const cloudinaryResponse = await axios.post(cloudinaryUrl, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        imageUrl = cloudinaryResponse.data.secure_url; 
+        console.log("Image uploaded to Cloudinary:", imageUrl);
+      } catch (error) {
+        Alert.alert("Error", "Failed to upload image to Cloudinary.");
+        console.error("Cloudinary upload error:", error.response?.data || error.message);
+        return;
+      }
+    }
+
+    const payload = {
+      name,
+      description,
+      place,
+      time: time.toISOString(),
+      status,
+    };
+
+    if (imageUrl) {
+      payload.image = imageUrl;
     }
 
     const apiEndpoint =
@@ -109,17 +136,9 @@ export default function ReportScreen() {
         ? process.env.EXPO_PUBLIC_BASE_URL + "lost-and-found/found-items/"
         : process.env.EXPO_PUBLIC_BASE_URL + "lost-and-found/lost-items/";
 
-    console.log("API Endpoint:", apiEndpoint);
-
+    // console.log("API Endpoint:", apiEndpoint);
     try {
-      const response = await axios(apiEndpoint, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer token`,
-          "Content-Type": "multipart/form-data",
-        },
-        data: formData,
-      });
+      const response = await axiosBackendInstance.post(apiEndpoint, payload);
 
       if (response.status === 200 || response.status === 201) {
         Alert.alert("Success", "Item reported successfully!");
@@ -128,7 +147,6 @@ export default function ReportScreen() {
         setPlace("");
         setStatus("LOST");
         setImage(null);
-        // setTime(new Date()); 
       } else {
         Alert.alert("Error", `Failed to report the item: ${response.statusText}`);
       }

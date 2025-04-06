@@ -1,5 +1,4 @@
 import { Text, View, Image, Dimensions, StyleSheet } from 'react-native'
-// import { SignOutButton } from '@/app/components/SignOutButton'
 import Sandbox from '@/app/components/Sandbox'
 import { useAuthStore } from '@/store/index'
 import CustomButton from '../components/CustomButton'
@@ -9,14 +8,21 @@ import { Redirect, useRouter } from 'expo-router'
 const { width } = Dimensions.get('window')
 
 export default function Page() {
-  const isSignedIn = useAuthStore((state) => state.isSignedIn)
-  const user = useAuthStore((state) => state.user)
+  const { isSignedIn, first_name, last_name, email } = useAuthStore((state) => state)
   const router = useRouter()
   const handleNavigateToSignIn = () => {
     router.push('/sign-in')
   }
-   // DONE implement signedIn here
-  console.log(isSignedIn)
+  
+  // More robust name display logic
+  let displayName = 'User';
+  if (first_name || last_name) {
+    displayName = `${first_name || ''} ${last_name || ''}`.trim();
+  } else if (email) {
+    // Fall back to email if no name available
+    displayName = email.split('@')[0];
+  }
+  
   return (
     <View style={styles.page}>
       {isSignedIn ? (
