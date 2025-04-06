@@ -40,3 +40,4 @@ app-example
 ./app/home/inspo.jsx
 google-services.json
 iti-trackit-firebase-adminsdk-fbsvc-2217da5ed9.json
+./.env
