@@ -43,7 +43,7 @@ axiosBackendInstance.interceptors.response.use(
         
         // Attempt to refresh token
         const response = await axios.post(
-          `${process.env.EXPO_PUBLIC_BACKEND_URL}/api/v1/accounts/auth/jwt/refresh/`,
+          `${process.env.EXPO_PUBLIC_BACKEND_URL}accounts/auth/jwt/refresh/`,
           { refresh: refreshToken }
         );
         

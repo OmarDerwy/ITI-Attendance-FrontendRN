@@ -11,7 +11,7 @@ import Toast from 'react-native-toast-message';
 import axiosBackendInstance from '../../../api/axios'
 
 const { width } = Dimensions.get("window");
-const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
+const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export default function ClockInOutScreen() {
   const [currentDate, setCurrentDate] = useState("");
@@ -31,7 +31,7 @@ export default function ClockInOutScreen() {
 
   const fetchUserStatus = async () => {
     try {
-      const response = await axiosBackendInstance.get(`api/v1/attendance/status/`);
+      const response = await axiosBackendInstance.get(`attendance/status/`);
 
       if (response.data.is_checked_in) {
         setIsCheckInDisabled(true); 

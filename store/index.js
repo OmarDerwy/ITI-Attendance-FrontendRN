@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import * as storage from 'expo-secure-store';
 
 export const useAuthStore = create((set) => ({
+  id: null,
   isSignedIn: false,
   username: '',
   email: '',
@@ -14,6 +15,7 @@ export const useAuthStore = create((set) => ({
     const data = userData || {};
     
     set({
+      id: data.id || null,
       isSignedIn: true,
       username: data.username || '',
       email: data.email || '',
@@ -32,6 +34,7 @@ export const useAuthStore = create((set) => ({
     }
     
     set({
+      id: null,
       isSignedIn: false,
       username: '',
       email: '',

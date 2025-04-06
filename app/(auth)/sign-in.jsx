@@ -23,7 +23,7 @@ export default function Page() {
     
     try {
       // Get auth tokens
-      const authResponse = await axiosBackendInstance.post('api/v1/accounts/auth/jwt/create/', {
+      const authResponse = await axiosBackendInstance.post('accounts/auth/jwt/create/', {
         email: emailAddress,
         password,
       });
@@ -34,7 +34,7 @@ export default function Page() {
       
       try {
         // Get user data with better error handling
-        const userResponse = await axiosBackendInstance.get('api/v1/accounts/auth/users/me/');
+        const userResponse = await axiosBackendInstance.get('accounts/auth/users/me/');
         
         // Ensure we have valid user data before updating state
         if (userResponse && userResponse.data) {
