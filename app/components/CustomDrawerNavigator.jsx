@@ -1,12 +1,24 @@
 import React from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import { View, Text, TouchableOpacity, Image, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  Dimensions,
+  StyleSheet,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import useWebSocketNotifications from "../../hooks/useWebSocketNotifications";
 
 const Drawer = createDrawerNavigator();
 const { width } = Dimensions.get("window");
 
 export default function CustomDrawerNavigator({ screens }) {
+  const router = useRouter();
+  const { unreadCount } = useWebSocketNotifications(); // Get unread notifications count
+
   return (
     <Drawer.Navigator
       initialRouteName="Home"
@@ -65,13 +77,21 @@ export default function CustomDrawerNavigator({ screens }) {
               </View>
             ),
             headerRight: () => (
-              <TouchableOpacity onPress={screen.onNotificationPress || (() => alert("Notifications!"))}>
+              <TouchableOpacity
+                onPress={() => router.push("/notifications")} // Navigate to notifications screen
+                style={styles.notificationIcon}
+              >
                 <Ionicons
                   name="notifications-outline"
                   size={25}
                   color="black"
                   style={{ marginRight: width * 0.04 }}
                 />
+                {unreadCount > 0 && ( // Show badge only if there are unread notifications
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{unreadCount}</Text>
+                  </View>
+                )}
               </TouchableOpacity>
             ),
           }}
@@ -80,3 +100,26 @@ export default function CustomDrawerNavigator({ screens }) {
     </Drawer.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  notificationIcon: {
+    position: "relative",
+    marginRight: width * 0.04,
+  },
+  badge: {
+    position: "absolute",
+    top: -5,
+    right: -0.01,
+    backgroundColor: "#c71717",
+    borderRadius: 10,
+    width: 18,
+    height: 18,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  badgeText: {
+    color: "white",
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+});
