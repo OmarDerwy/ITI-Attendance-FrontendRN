@@ -15,13 +15,18 @@ import CustomDrawerNavigator from "../../components/CustomDrawerNavigator";
 import ClockInOutScreen from "../attendance";
 import ReportScreen from "../report";
 import LogoutScreen from "../logout";
+import { useAuthStore } from '@/store/index';
 
 
 const Drawer = createDrawerNavigator();
 const { width, height } = Dimensions.get("window");
 
 function HomeScreen({ navigation }) {
+  const { first_name } = useAuthStore((state) => state.first_name);
+  const { last_name } = useAuthStore((state) => state.last_name);
+  const { email } = useAuthStore((state) => state.email);
   const router = useRouter();
+  console.log(`Welcome ${first_name} ${last_name}`);
 
   return (
     <ImageBackground
@@ -34,7 +39,7 @@ function HomeScreen({ navigation }) {
             <MaterialCommunityIcons name="account-circle" size={90} color="gray" />
           </View>
           <View style={styles.welcomeText}>
-            <Text style={styles.welcome}>Welcome, Ahmed!</Text>
+            <Text style={styles.welcome}>Welcome, {first_name}!</Text>
             <Text style={styles.subtitle}>
               Secure Your Presence, {"\n"}Simplify Your Day.
             </Text>
