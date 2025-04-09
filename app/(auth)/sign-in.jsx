@@ -1,6 +1,6 @@
 import { Link, useRouter } from 'expo-router'
 import { Text, TextInput, TouchableOpacity, View, Image, StyleSheet, Dimensions, Modal, Alert } from 'react-native'
-import React from 'react'
+import React, { useContext } from 'react'
 import { useLoadingStore, useAuthStore } from '../../store'
 import axiosBackendInstance from '../../api/axios'
 import * as storage from 'expo-secure-store'
@@ -12,8 +12,8 @@ const { width } = Dimensions.get('window')
 export default function Page() {  
 
   const { isLoaded, setLoading } = useLoadingStore((state) => state)
-  const setUser = useAuthStore((state => state.setUser))
   const router = useRouter()
+  const userContext = useAuthStore((state) => state)
 
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
@@ -38,17 +38,14 @@ export default function Page() {
         
         // Ensure we have valid user data before updating state
         if (userResponse && userResponse.data) {
+          console.log('User data:', userResponse.data);
           // Update user state with all returned data
-          setUser(userResponse.data);
+          userContext.setUser(userResponse.data);
+          
+          // Add debug logging to confirm data was set
+          console.log('After setUser call, store state:');
         } else {
           // Handle missing user data
-          setUser({
-            username: emailAddress,
-            email: emailAddress,
-            first_name: '',
-            last_name: '',
-            role: 'student'
-          });
         }
         
         // Navigate to home
@@ -56,11 +53,7 @@ export default function Page() {
       } catch (userError) {
         console.error('Error fetching user data:', userError);
         // Even if user data fetch fails, we're still authenticated
-        // Set minimal user data
-        setUser({
-          email: emailAddress,
-          username: emailAddress
-        });
+        // Set minimal user dat
         router.replace('/(home)/');
       }
     } catch (error) {

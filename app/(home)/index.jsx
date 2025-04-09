@@ -10,6 +10,9 @@ const { width } = Dimensions.get('window')
 export default function Page() {
   const { isSignedIn, first_name, last_name, email } = useAuthStore((state) => state)
   const router = useRouter()
+  console.log(`Welcome ${first_name} ${last_name}`)
+  console.log(`Email: ${email}`)
+  console.log(`isSignedIn: ${isSignedIn}`)
   const handleNavigateToSignIn = () => {
     router.push('/sign-in')
   }
@@ -26,7 +29,7 @@ export default function Page() {
   return (
     <View style={styles.page}>
       {isSignedIn ? (
-        <Redirect href="/(home)/home" />
+        <Redirect href={"/(home)/home"} />
       ) : (
         <View style={styles.container}>
           <View style={styles.imageContainer}>

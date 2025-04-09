@@ -2,7 +2,7 @@ import axiosBackendInstance from './axios';
 
 export const getUserNotifications = async () => {
   try {
-    const response = await axiosBackendInstance.get('/api/v1/lost-and-found/notifications');
+    const response = await axiosBackendInstance.get('lost-and-found/notifications');
     console.log('Notifications response:', response.data.results);
     return Array.isArray(response.data.results) ? response.data.results : [];
   } catch (error) {
@@ -14,7 +14,7 @@ export const getUserNotifications = async () => {
 export const markNotificationAsRead = async (notificationId: number) => {
   try {
     const response = await axiosBackendInstance.post(
-      `/api/v1/lost-and-found/notifications/${notificationId}/mark_as_read/`
+      `lost-and-found/notifications/${notificationId}/mark_as_read/`
     );
     console.log('Mark as read response:', response.data);
     return response.data;
@@ -27,7 +27,7 @@ export const markNotificationAsRead = async (notificationId: number) => {
 export const markAllNotificationsAsRead = async () => {
   try {
     const response = await axiosBackendInstance.post(
-      '/api/v1/lost-and-found/notifications/mark_all_as_read/'
+      'lost-and-found/notifications/mark_all_as_read/'
     );
     console.log('Mark all as read response:', response.data);
     return response.data;
@@ -40,7 +40,7 @@ export const markAllNotificationsAsRead = async () => {
 export const deleteNotification = async (id: number) => {
     try {
       const response = await axiosBackendInstance.delete(
-        `/api/v1/lost-and-found/notifications/${id}/`
+        `lost-and-found/notifications/${id}/`
       );
       console.log('Delete notification response:', response.data);
       return response.data;

@@ -5,10 +5,8 @@ import * as storage from 'expo-secure-store'
 import { useAuthStore } from '../../store/index'
 import { COLORS, FONT_SIZES } from '../constants/theme'
 export default function Sandbox() {
-  const setUser = useAuthStore((state) => state.setUser)
   const handleSignOut = () => {
      storage.setItem('token', "")
-     setUser(null)
      console.log('signed out')
   }
   return (
