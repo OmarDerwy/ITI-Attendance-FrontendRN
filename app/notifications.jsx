@@ -134,12 +134,12 @@ export default function NotificationsScreen() {
         contentContainerStyle={styles.notificationList}
       />
 
-      {/* See More Button */}
+      {/* See More Button
       {visibleCount < notifications.length && (
         <TouchableOpacity onPress={handleSeeMore} style={styles.seeMoreButton}>
           <Text style={styles.seeMoreText}>See More</Text>
         </TouchableOpacity>
-      )}
+      )} */}
     </View>
   );
 }
