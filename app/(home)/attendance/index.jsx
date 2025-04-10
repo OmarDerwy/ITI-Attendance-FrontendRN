@@ -9,6 +9,8 @@ import { v4 as uuidv4 } from 'uuid';
 import Constants from "expo-constants";
 import Toast from 'react-native-toast-message';
 import axiosBackendInstance from '../../../api/axios'
+import { useAuthStore } from '@/store/index';
+
 
 const { width } = Dimensions.get("window");
 const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
@@ -19,6 +21,10 @@ export default function ClockInOutScreen() {
   const [deviceUUID, setDeviceUUID] = useState(null);
   const [isCheckInDisabled, setIsCheckInDisabled] = useState(false); 
   const [isCheckOutDisabled, setIsCheckOutDisabled] = useState(false); 
+  const { first_name } = useAuthStore((state) => state.first_name);
+  const { id } = useAuthStore((state) => state.id);
+
+  
 
   const fetchDeviceUUID = async () => {
     let storedUUID = await SecureStore.getItemAsync("deviceUUID");
@@ -87,13 +93,20 @@ export default function ClockInOutScreen() {
 
   const checkInOrOut = async (type) => {
     if (!deviceUUID) {
+      console.log("deviceUUID",deviceUUID);
+      
       Toast.show({ type: "error", text1: "UUID is not available" });
       return;
     }
+    console.log(id);
     const location = await getLocation();
     if (!location) return;
 
-    const { latitude, longitude } = location.coords;
+    // const { latitude, longitude } = location.coords;
+    const latitude = 31.194138;
+    const longitude = 29.904244;
+  
+    
     // console.log("Sending:", {
     //   user_id: 1,
     //   uuid: deviceUUID,
@@ -103,16 +116,16 @@ export default function ClockInOutScreen() {
 
     try {
       const response = await axiosBackendInstance.post(
-        `api/v1/attendance/${type}/`,
+        `attendance/${type}/`,
         {
-          user_id: 34,
+          user_id: id,
           uuid: deviceUUID,
           latitude,
           longitude,
         }
       );
 
-      console.log("Response:", response.data);
+      console.log("checkin Response:", response.data);
 
       if (response.data.status === "success") {
         Toast.show({
@@ -139,6 +152,7 @@ export default function ClockInOutScreen() {
       }
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message;
+      console.error("Error during check-in/out:", errorMessage);
       Toast.show({
         type: "error",
         text1: "API error",
@@ -162,7 +176,7 @@ export default function ClockInOutScreen() {
               color="gray"
             />
           </View>
-          <Text style={styles.username}>Ahmed</Text>
+          <Text style={styles.username}>{first_name}</Text>
           <Text style={styles.date}>{currentDate}</Text>
           <Text style={styles.time}>{currentTime}</Text>
         </View>
