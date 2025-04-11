@@ -3,7 +3,7 @@ import axiosBackendInstance from './axios';
 export const getUserNotifications = async () => {
   try {
     const response = await axiosBackendInstance.get('lost-and-found/notifications/');
-    console.log('Notifications response:', response.data.results);
+    console.log('Notifications response:', response.data);
     return Array.isArray(response.data) ? response.data : [];
   } catch (error) {
     console.error('Error fetching notifications:', error);
