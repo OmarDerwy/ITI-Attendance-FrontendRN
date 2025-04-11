@@ -102,9 +102,9 @@ export default function ClockInOutScreen() {
     const location = await getLocation();
     if (!location) return;
 
-    // const { latitude, longitude } = location.coords;
-    const latitude = 31.194138;
-    const longitude = 29.904244;
+    const { latitude, longitude } = location.coords;
+    // const latitude = 31.194138;
+    // const longitude = 29.904244;
   
     
     // console.log("Sending:", {
