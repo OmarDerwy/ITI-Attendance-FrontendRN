@@ -32,8 +32,8 @@ export default function useWebSocketNotifications() {
 
   useEffect(() => {
     const connectWebSocket = async () => {
-      const token = await storage.getItemAsync("token");
-      const wsUrl = `ws://192.168.1.7:8000/ws/notifications/?token=${token}`;
+      const token = await storage.getItemAsync("access_token");
+      const wsUrl = `ws://192.168.1.115:8000/ws/notifications/?token=${token}`;
 
       ws.current = new WebSocket(wsUrl);
 
