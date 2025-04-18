@@ -10,6 +10,8 @@ import Constants from "expo-constants";
 import Toast from 'react-native-toast-message';
 import axiosBackendInstance from '../../../api/axios'
 import { useAuthStore } from '@/store/index';
+import { useQuery } from '@tanstack/react-query';
+import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing } from 'react-native-reanimated';
 
 
 const { width } = Dimensions.get("window");
@@ -167,6 +169,32 @@ export default function ClockInOutScreen() {
     }
   };
 
+  // code to fetch the next upcoming day to be used in the check in and check out using tanstack
+  const { data: upcomingRecords, isLoading: isLoadingRecords, error } = useQuery({
+    queryKey: ["upcomingRecords"],
+    queryFn: async () => {
+      const response = await axiosBackendInstance.get(`attendance/upcoming-records/`);
+      return response.data;
+    },
+    refetchOnMount: true,
+    staleTime: 0,
+  });
+
+
+  const spin = useSharedValue(0);
+
+  useEffect(() => {
+    spin.value = withRepeat(
+      withTiming(360, { duration: 1000, easing: Easing.linear }),
+      -1,
+      false
+    );
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${spin.value}deg` }],
+  }));
+
   return (
     <ImageBackground
       source={require("../../../assets/images/home-bg.webp")}
@@ -174,12 +202,52 @@ export default function ClockInOutScreen() {
     >
       <View style={styles.overlay}>
         <View style={styles.profileSection}>
-          <View style={styles.avatarWrapper}>
-            <MaterialCommunityIcons
-              name="account-circle"
-              size={100}
-              color="gray"
-            />
+          <View>
+            {isLoadingRecords ? (
+              <Animated.View style={animatedStyle}>
+                <MaterialCommunityIcons name="loading" size={90} color="gray" />
+              </Animated.View>
+            ) : (
+              upcomingRecords && upcomingRecords.data && upcomingRecords.data.length > 0 ? (
+                <View
+                  style={{
+                    backgroundColor: "#222",
+                    borderRadius: 10,
+                    padding: 16,
+                    width: width * 0.8,
+                    marginBottom: 10,
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16, marginBottom: 4 }}>
+                    {upcomingRecords.data[0].schedule?.name || "Upcoming Schedule"}
+                  </Text>
+                  <Text style={{ color: "#bbb", fontSize: 14 }}>
+                    Date: {upcomingRecords.data[0].schedule?.created_at?.slice(0, 10)}
+                  </Text>
+                  <Text style={{ color: "#bbb", fontSize: 14 }}>
+                    Start: {new Date(upcomingRecords.data[0].schedule?.start_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </Text>
+                  <Text style={{ color: "#bbb", fontSize: 14 }}>
+                    End: {new Date(upcomingRecords.data[0].schedule?.end_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </Text>
+                  <Text style={{ color: "#bbb", fontSize: 14, marginTop: 4 }}>
+                    Status: {upcomingRecords.data[0].status}
+                  </Text>
+                  {(upcomingRecords.data[0].status?.includes("late-excused") && upcomingRecords.data[0].adjusted_time) && (
+                    <Text style={{ color: "#ffb300", fontSize: 14 }}>
+                      Adjusted Start: {new Date(upcomingRecords.data[0].adjusted_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    </Text>
+                  )}
+                  {(upcomingRecords.data[0].status?.includes("early-excused") && upcomingRecords.data[0].adjusted_time) && (
+                    <Text style={{ color: "#ffb300", fontSize: 14 }}>
+                      Adjusted End: {new Date(upcomingRecords.data[0].adjusted_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    </Text>
+                  )}
+                </View>
+              ) : (
+                <MaterialCommunityIcons name="calendar-clock" size={90} color="gray" />
+              ))}
           </View>
           <Text style={styles.username}>{first_name}</Text>
           <Text style={styles.date}>{currentDate}</Text>
@@ -193,7 +261,7 @@ export default function ClockInOutScreen() {
                 isCheckInDisabled && styles.disabledButton,
               ]}
               onPress={() => checkInOrOut("check-in")}
-              disabled={isCheckInDisabled} // Disable button if state is true
+              disabled={isCheckInDisabled}
             >
               <MaterialCommunityIcons
                 name="map-marker-check"
@@ -210,7 +278,7 @@ export default function ClockInOutScreen() {
                 isCheckOutDisabled && styles.disabledButton,
               ]}
               onPress={() => checkInOrOut("check-out")}
-              disabled={isCheckOutDisabled} // Disable button if state is true
+              disabled={isCheckOutDisabled}
             >
               <MaterialIcons name="location-off" size={30} color="white" />
             </TouchableOpacity>
@@ -242,7 +310,7 @@ const styles = StyleSheet.create({
   avatarWrapper: {
     borderWidth: 2,
     borderColor: "green",
-    borderRadius: 100,
+    borderRadius: 10,
     padding: 5,
   },
   username: {
