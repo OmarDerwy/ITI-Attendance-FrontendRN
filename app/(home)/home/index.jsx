@@ -16,7 +16,7 @@ import ClockInOutScreen from "../attendance";
 import ReportScreen from "../report";
 import LogoutScreen from "../logout";
 import { useAuthStore } from '@/store/index';
-
+import LeaveRequestScreen from "../leave-request";
 
 const Drawer = createDrawerNavigator();
 const { width, height } = Dimensions.get("window");
@@ -59,6 +59,12 @@ function HomeScreen({ navigation }) {
             <MaterialIcons name="report-problem" size={30} color="#ac0808" />
             <Text style={styles.actionLabel}>Report Found/Lost Item</Text>
           </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.actionButton}
+            onPress={() => navigation.navigate("Leave Request")}>
+            <MaterialIcons name="event-busy" size={30} color="#ac0808" />
+            <Text style={styles.actionLabel}>Request Leave</Text>
+          </TouchableOpacity>
         </View >
 
       </View>
@@ -66,16 +72,12 @@ function HomeScreen({ navigation }) {
   );
 }
 
-
-
-
-
-
 export default function App() {
   const screens = [
     { name: "Home", component: HomeScreen, title: "Home" },
     { name: "Clock In/Out", component: ClockInOutScreen, title: "Clock In/Out" },
     { name: "Report Found/Lost Item", component: ReportScreen, title: "Report Found/Lost Item" },
+    { name: "Leave Request", component: LeaveRequestScreen, title: "Request Leave" },
     { name: "Logout", component: LogoutScreen, title: "Logout" },
   ];
 
