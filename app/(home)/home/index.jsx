@@ -24,9 +24,12 @@ const { width, height } = Dimensions.get("window");
 function HomeScreen({ navigation }) {
   const { first_name } = useAuthStore((state) => state.first_name);
   const { last_name } = useAuthStore((state) => state.last_name);
+  const { role } = useAuthStore((state) => state.role);
   const { email } = useAuthStore((state) => state.email);
   const router = useRouter();
   console.log(`Welcome ${first_name} ${last_name}`);
+  console.log(`Email: ${email}`);
+  console.log(`Role: ${role}`);
 
   return (
     <ImageBackground
@@ -47,12 +50,12 @@ function HomeScreen({ navigation }) {
         </View>
         <View style={styles.content}>
 
-          <TouchableOpacity style={styles.actionButton}
+          { role == "student" && <TouchableOpacity style={styles.actionButton}
           onPress={() => navigation.navigate("Clock In/Out")}
-      >
+          >
             <MaterialCommunityIcons name="fingerprint" size={30} color="#ac0808" />
             <Text style={styles.actionLabel}>Clock In/Out</Text>
-          </TouchableOpacity>
+          </TouchableOpacity>}
 
           <TouchableOpacity style={styles.actionButton}
             onPress={() => navigation.navigate("Report Found/Lost Item")}>
@@ -60,11 +63,11 @@ function HomeScreen({ navigation }) {
             <Text style={styles.actionLabel}>Report Found/Lost Item</Text>
           </TouchableOpacity>
           
-          <TouchableOpacity style={styles.actionButton}
+          { role == "student" && <TouchableOpacity style={styles.actionButton}
             onPress={() => navigation.navigate("Leave Request")}>
             <MaterialIcons name="event-busy" size={30} color="#ac0808" />
             <Text style={styles.actionLabel}>Request Leave</Text>
-          </TouchableOpacity>
+          </TouchableOpacity>}
         </View >
 
       </View>
@@ -73,6 +76,7 @@ function HomeScreen({ navigation }) {
 }
 
 export default function App() {
+  const { role } = useAuthStore((state) => state.role);
   const screens = [
     { name: "Home", component: HomeScreen, title: "Home" },
     { name: "Clock In/Out", component: ClockInOutScreen, title: "Clock In/Out" },
@@ -80,6 +84,11 @@ export default function App() {
     { name: "Leave Request", component: LeaveRequestScreen, title: "Request Leave" },
     { name: "Logout", component: LogoutScreen, title: "Logout" },
   ];
+
+  if (role !== "student") {
+    screens.splice(1, 1); // Remove Clock In/Out for non-students
+    screens.splice(2, 1); // Remove Leave Request for non-students
+  }
 
   return <CustomDrawerNavigator screens={screens} />;
 }
