@@ -39,9 +39,16 @@ export default function Page() {
         // Ensure we have valid user data before updating state
         if (userResponse && userResponse.data) {
           console.log('User data:', userResponse.data);
-          // Update user state with all returned data
-          userContext.setUser(userResponse.data);
-          
+          // Map API response to expected user shape
+          const userData = userResponse.data;
+          userContext.setUser({
+            id: userData.id,
+            email: userData.email,
+            username: userData.email, // fallback if username not present
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+            role: Array.isArray(userData.groups) && userData.groups.length > 0 ? userData.groups[0] : 'student',
+          });
           // Add debug logging to confirm data was set
           console.log('After setUser call, store state:');
         } else {
