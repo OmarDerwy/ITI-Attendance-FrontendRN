@@ -61,7 +61,7 @@ export default function CustomDrawerNavigator({ screens }) {
               >
                 <Image
                   source={require("../../assets/images/iti-logo.png")}
-                  style={{ width: 100, height: 40, marginRight: -32 }}
+                  style={{ width: 100, height: 40, marginRight: -27 }}
                   resizeMode="contain"
                 />
                 <Text
@@ -72,7 +72,7 @@ export default function CustomDrawerNavigator({ screens }) {
                     alignSelf: "flex-end",
                   }}
                 >
-                  -TrackIt
+                  TrackIt
                 </Text>
               </View>
             ),
