@@ -197,7 +197,7 @@ export default function ClockInOutScreen() {
 
   return (
     <ImageBackground
-      source={require("../../../assets/images/home-bg.webp")}
+      source={require("../../../assets/images/blurry-colors.jpg")}
       style={styles.background}
     >
       <View style={styles.overlay}>

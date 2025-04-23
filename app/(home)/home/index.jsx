@@ -32,10 +32,6 @@ function HomeScreen({ navigation }) {
   console.log(`Role: ${role}`);
 
   return (
-    <ImageBackground
-      source={require("../../../assets/images/home-bg.webp")}
-      style={styles.background}
-    >
       <View style={styles.overlay}>
         <View style={styles.profileSection}>
           <View style={styles.avatarWrapper}>
@@ -71,7 +67,6 @@ function HomeScreen({ navigation }) {
         </View >
 
       </View>
-    </ImageBackground>
   );
 }
 
@@ -100,7 +95,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "#F9F9F9",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "space-around",
@@ -113,6 +108,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     backgroundColor: "rgba(211, 211, 211, 0.212)",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
     borderRadius: 10,
     marginHorizontal: 20,
     width: "85%",
@@ -124,6 +120,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     backgroundColor: "rgba(211, 211, 211, 0.212)",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
     borderRadius: 10,
     marginHorizontal: 20,
     marginVertical: 30,
@@ -148,7 +145,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   subtitle: {
-    color: "white",
+    color: "black",
     fontSize: 12,
     textAlign: "center",
     marginBottom: 30,
