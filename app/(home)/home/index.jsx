@@ -32,6 +32,7 @@ function HomeScreen({ navigation }) {
   console.log(`Role: ${role}`);
 
   return (
+    <ImageBackground source={require("../../../assets/images/el3asema2.png")} style={styles.background}>
       <View style={styles.overlay}>
         <View style={styles.profileSection}>
           <View style={styles.avatarWrapper}>
@@ -65,8 +66,8 @@ function HomeScreen({ navigation }) {
             <Text style={styles.actionLabel}>Request Leave</Text>
           </TouchableOpacity>}
         </View >
-
       </View>
+    </ImageBackground>
   );
 }
 
@@ -95,7 +96,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: "#F9F9F9",
+    // backgroundColor: "rgba(0, 0, 0, 0.5)",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "space-around",
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: "rgba(211, 211, 211, 0.212)",
+    backgroundColor: "rgba(211, 211, 211, 0.5)",
     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
     borderRadius: 10,
     marginHorizontal: 20,
@@ -119,7 +120,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: "rgba(211, 211, 211, 0.212)",
+    backgroundColor: "rgba(211, 211, 211, 0.5)",
     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
     borderRadius: 10,
     marginHorizontal: 20,
