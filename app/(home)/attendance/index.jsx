@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ImageBackground } from "react-native";
-import { getRandomBytes } from 'expo-random';
+import { getRandomBytes } from 'expo-crypto';
 import * as SecureStore from 'expo-secure-store';
 import * as Location from 'expo-location';
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
