@@ -33,7 +33,7 @@ export default function useWebSocketNotifications() {
   useEffect(() => {
     const connectWebSocket = async () => {
       const token = await storage.getItemAsync("access_token");
-      const wsUrl = `ws://192.168.1.115:8000/ws/notifications/?token=${token}`;
+      const wsUrl = `${process.env.EXPO_PUBLIC_BACKEND_WS_URL || 'ws://localhost:8000/'}ws/notifications/?token=${token}`;
 
       ws.current = new WebSocket(wsUrl);
 
