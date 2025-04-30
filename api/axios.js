@@ -3,7 +3,7 @@ import * as storage from 'expo-secure-store';
 import { useAuthStore } from '../store';
 
 const axiosBackendInstance = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_BACKEND_URL,
+  baseURL: `http://trackit-djangobackend-qvqtqz-58d84a-129-159-8-224.traefik.me/api/v1/`,
 });
 
 // Request interceptor to add the auth token
