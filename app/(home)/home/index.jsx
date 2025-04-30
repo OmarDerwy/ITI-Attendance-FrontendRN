@@ -17,6 +17,7 @@ import ReportScreen from "../report";
 import LogoutScreen from "../logout";
 import { useAuthStore } from '@/store/index';
 import LeaveRequestScreen from "../leave-request";
+import LeaveRequestCenter from "../leave-requests-center";
 
 const Drawer = createDrawerNavigator();
 const { width, height } = Dimensions.get("window");
@@ -54,6 +55,12 @@ function HomeScreen({ navigation }) {
             <Text style={styles.actionLabel}>Clock In/Out</Text>
           </TouchableOpacity>}
 
+          { role == "supervisor" && <TouchableOpacity style={styles.actionButton}
+            onPress={() => navigation.navigate("Leave Requests Center")}>
+            <MaterialIcons name="assignment" size={30} color="#ac0808" />
+            <Text style={styles.actionLabel}>Leave Requests Center</Text>
+          </TouchableOpacity>}
+
           <TouchableOpacity style={styles.actionButton}
             onPress={() => navigation.navigate("Report Found/Lost Item")}>
             <MaterialIcons name="report-problem" size={30} color="#ac0808" />
@@ -76,6 +83,7 @@ export default function App() {
   const screens = [
     { name: "Home", component: HomeScreen, title: "Home" },
     { name: "Clock In/Out", component: ClockInOutScreen, title: "Clock In/Out" },
+    { name: "Leave Requests Center", component: LeaveRequestCenter, title: "Leave Requests Center" },
     { name: "Report Found/Lost Item", component: ReportScreen, title: "Report Found/Lost Item" },
     { name: "Leave Request", component: LeaveRequestScreen, title: "Request Leave" },
     { name: "Logout", component: LogoutScreen, title: "Logout" },
@@ -83,7 +91,10 @@ export default function App() {
 
   if (role !== "student") {
     screens.splice(1, 1); // Remove Clock In/Out for non-students
-    screens.splice(2, 1); // Remove Leave Request for non-students
+    screens.splice(3, 1); // Remove Leave Request for non-students
+  }
+  if (role !== "supervisor") {
+    screens.splice(2, 1); // Remove Leave Requests Center for non-supervisors
   }
 
   return <CustomDrawerNavigator screens={screens} />;
