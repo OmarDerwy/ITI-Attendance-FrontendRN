@@ -133,8 +133,8 @@ export default function ReportScreen() {
 
     const apiEndpoint =
       status === "FOUND"
-        ? `http://trackit-djangobackend-qvqtqz-58d84a-129-159-8-224.traefik.me/` + "lost-and-found/found-items/"
-        : `http://trackit-djangobackend-qvqtqz-58d84a-129-159-8-224.traefik.me/` + "lost-and-found/lost-items/";
+        ? `http://trackit-djangobackend-ai-imp-n5v3ur-83552d-129-159-8-224.traefik.me/` + "lost-and-found/found-items/"
+        : `http://trackit-djangobackend-ai-imp-n5v3ur-83552d-129-159-8-224.traefik.me/` + "lost-and-found/lost-items/";
 
     // console.log("API Endpoint:", apiEndpoint);
     try {
