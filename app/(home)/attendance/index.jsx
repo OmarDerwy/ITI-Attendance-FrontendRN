@@ -197,7 +197,7 @@ export default function ClockInOutScreen() {
 
   return (
     <ImageBackground
-      source={require("../../../assets/images/blurry-colors.jpg")}
+      source={require("../../../assets/images/el3asema2.png")}
       style={styles.background}
     >
       <View style={styles.overlay}>
