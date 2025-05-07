@@ -3,7 +3,7 @@ import * as storage from 'expo-secure-store';
 import { useAuthStore } from '../store';
 
 const axiosBackendInstance = axios.create({
-  baseURL: EXPO_PUBLIC_BACKEND_URL || 'http://192.168.1.115:8000/api/v1/',
+  baseURL: process.env.EXPO_PUBLIC_BACKEND_URL || 'http://192.168.1.115:8000/api/v1/',
 });
 
 // Request interceptor to add the auth token
