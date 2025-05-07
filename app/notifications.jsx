@@ -126,20 +126,14 @@ export default function NotificationsScreen() {
         <Text style={styles.title}>Notifications</Text>
       </View>
 
-      {/* Notifications List */}
-      <FlatList
-        data={displayedNotifications.slice().reverse()} 
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderNotificationItem}
-        contentContainerStyle={styles.notificationList}
-      />
-
-      {/* See More Button
-      {visibleCount < notifications.length && (
-        <TouchableOpacity onPress={handleSeeMore} style={styles.seeMoreButton}>
-          <Text style={styles.seeMoreText}>See More</Text>
-        </TouchableOpacity>
-      )} */}
+      <View style={styles.notificationListWrapper}>
+        <FlatList
+          data={displayedNotifications.slice().reverse()} 
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderNotificationItem}
+          contentContainerStyle={styles.notificationList}
+        />
+      </View>
     </View>
   );
 }
@@ -164,6 +158,11 @@ const styles = StyleSheet.create({
   },
   notificationList: {
     flexGrow: 1,
+  },
+  notificationListWrapper: {
+    flex: 1,
+    zIndex: 1,
+    position: 'relative',
   },
   notificationItemContainer: {
     flexDirection: "row",
@@ -203,8 +202,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 5,
-    zIndex: 1000,
+    elevation: 999,
+    zIndex: 999,
   },
   menuOption: {
     padding: 10,

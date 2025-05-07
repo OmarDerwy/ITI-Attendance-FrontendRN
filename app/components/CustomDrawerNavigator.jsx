@@ -17,7 +17,7 @@ const { width } = Dimensions.get("window");
 
 export default function CustomDrawerNavigator({ screens }) {
   const router = useRouter();
-  const { unreadCount } = useWebSocketNotifications(); // Get unread notifications count
+  const { unreadCount } = useWebSocketNotifications(); 
 
   return (
     <Drawer.Navigator

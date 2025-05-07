@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
     borderRadius: 10,
     marginHorizontal: 20,
-    width: "85%",
+    width: "90%",
   },
   content: {
     alignItems: "center",
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginHorizontal: 20,
     marginVertical: 30,
-    width: "85%",
+    width: "90%",
     height: height * 0.35,
   },
   avatarWrapper: {
