@@ -17,8 +17,6 @@ import { MaterialIcons } from "@expo/vector-icons";
 import axios from "axios";
 import axiosBackendInstance from '../../../api/axios'
 
-// import DateTimePicker from "@react-native-community/datetimepicker"; 
-
 const { width } = Dimensions.get("window");
 
 export default function ReportScreen() {
@@ -215,24 +213,6 @@ export default function ReportScreen() {
           </View>
         </View>
       </Modal>
-
-      {/*
-      <TouchableOpacity
-        style={styles.timePickerButton}
-        onPress={() => setShowTimePicker(true)}
-      >
-        <Text style={styles.timePickerText}>
-          {`Time: ${time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`}
-        </Text>
-      </TouchableOpacity>
-      {showTimePicker && (
-        <DateTimePicker
-          value={time}
-          mode="time"
-          display="default"
-          onChange={handleTimeChange}
-        />
-      )} */}
 
       <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
         <Text style={styles.imagePickerText}>Pick an Image</Text>

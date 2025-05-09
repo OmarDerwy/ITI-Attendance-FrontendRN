@@ -4,9 +4,7 @@ import { getRandomBytes } from 'expo-crypto';
 import * as SecureStore from 'expo-secure-store';
 import * as Location from 'expo-location';
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import axios from "axios";
 import { v4 as uuidv4 } from 'uuid';
-import Constants from "expo-constants";
 import Toast from 'react-native-toast-message';
 import axiosBackendInstance from '../../../api/axios'
 import { useAuthStore } from '@/store/index';
