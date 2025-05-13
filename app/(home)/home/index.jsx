@@ -20,20 +20,25 @@ import LeaveRequestCenter from "../leave-requests-center";
 
 const { width, height } = Dimensions.get("window");
 
+function isAllowed(allowedRoles, role) {
+  if (allowedRoles === "all") return true;
+  return Array.isArray(allowedRoles) && allowedRoles.includes(role);
+}
+
 // Unified config for screens and buttons
 const screensConfig = [
   {
     name: "Home",
     component: null, // HomeScreen will be injected below
     title: "Home",
-    allowedRoles: ["student", "supervisor"],
+    allowedRoles: "all",
     showButton: false
   },
   {
     name: "Clock In/Out",
     component: ClockInOutScreen,
     title: "Clock In/Out",
-    allowedRoles: ["student"],
+    allowedRoles: ["student", "guest"],
     showButton: true,
     icon: { type: MaterialCommunityIcons, name: "fingerprint", color: "#ac0808", size: 30 },
     buttonLabel: "Clock In/Out"
@@ -42,7 +47,7 @@ const screensConfig = [
     name: "Leave Requests Center",
     component: LeaveRequestCenter,
     title: "Leave Requests Center",
-    allowedRoles: ["supervisor"],
+    allowedRoles: ["supervisor", "coordinator"],
     showButton: true,
     icon: { type: MaterialIcons, name: "assignment", color: "#ac0808", size: 30 },
     buttonLabel: "Leave Requests Center"
@@ -51,7 +56,7 @@ const screensConfig = [
     name: "Report Found/Lost Item",
     component: ReportScreen,
     title: "Report Found/Lost Item",
-    allowedRoles: ["student", "supervisor"],
+    allowedRoles: "all",
     showButton: true,
     icon: { type: MaterialIcons, name: "report-problem", color: "#ac0808", size: 30 },
     buttonLabel: "Report Found/Lost Item"
@@ -69,7 +74,7 @@ const screensConfig = [
     name: "Logout",
     component: LogoutScreen,
     title: "Logout",
-    allowedRoles: ["student", "supervisor"],
+    allowedRoles: "all",
     showButton: false
   }
 ];
@@ -99,7 +104,7 @@ function HomeScreen({ navigation }) {
           </View>
         </View>
         <View style={styles.content}>
-          {screensConfig.filter(s => s.showButton && s.allowedRoles.includes(role)).map(screen => (
+          {screensConfig.filter(s => s.showButton && isAllowed(s.allowedRoles, role)).map(screen => (
             <TouchableOpacity
               key={screen.name}
               style={styles.actionButton}
@@ -127,7 +132,7 @@ screensConfig[0].component = HomeScreen;
 export default function App() {
   const { role } = useAuthStore((state) => state.role);
   // Only include screens allowed for the current role
-  const screens = screensConfig.filter(s => s.allowedRoles.includes(role));
+  const screens = screensConfig.filter(s => isAllowed(s.allowedRoles, role));
   return <CustomDrawerNavigator screens={screens} />;
 }
 
