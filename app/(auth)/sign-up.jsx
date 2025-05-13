@@ -1,7 +1,6 @@
 import { Text, TextInput, View, Image, StyleSheet, Dimensions, Modal, Alert } from 'react-native'
 import React from 'react'
 import { useLoadingStore, useAuthStore } from '../../store'
-import axiosBackendInstance from '../../api/axios'
 import CustomButton from '../components/CustomButton'
 import { COLORS, FONT_SIZES } from '../constants/theme'
 import { useRouter } from 'expo-router'
@@ -19,7 +18,7 @@ export default function SignUpScreen() {
   const [firstName, setFirstName] = React.useState('')
   const [lastName, setLastName] = React.useState('')
 
-  const onSignUpPress = async () => {
+  const onSignUpPress = () => {
     if (!emailAddress || !password || !confirmPassword || !firstName || !lastName) {
       Alert.alert('Missing fields', 'Please fill in all fields.')
       return
@@ -28,23 +27,16 @@ export default function SignUpScreen() {
       Alert.alert('Password mismatch', 'Passwords do not match.')
       return
     }
-    setLoading(true)
-    try {
-      // Register user
-      await axiosBackendInstance.post('accounts/auth/users/', {
+    // Pass collected data to sign-up-details screen
+    router.replace({
+      pathname: '/sign-up-details',
+      params: {
         email: emailAddress,
         password,
         first_name: firstName,
         last_name: lastName,
-      })
-      // Optionally, you can auto-login here or just redirect to details page
-      router.replace('/sign-up-details')
-    } catch (error) {
-      console.error('Registration error:', error)
-      Alert.alert('Registration failed', 'Please check your details and try again.')
-    } finally {
-      setLoading(false)
-    }
+      },
+    })
   }
 
   return (

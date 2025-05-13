@@ -3,25 +3,45 @@ import { View, Text, TextInput, StyleSheet, Dimensions, Modal, Alert } from 'rea
 import CustomButton from '../components/CustomButton'
 import { COLORS, FONT_SIZES } from '../constants/theme'
 import { useRouter } from 'expo-router'
+import axiosBackendInstance from '../../api/axios'
+import { useLocalSearchParams } from 'expo-router'
 
 const { width } = Dimensions.get('window')
 
 export default function SignUpDetails() {
   const router = useRouter()
+  const params = useLocalSearchParams()
   const [dob, setDob] = useState('')
   const [graduationDate, setGraduationDate] = useState('')
   const [major, setMajor] = useState('')
   const [gpa, setGpa] = useState('')
   const [city, setCity] = useState('')
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (!dob || !graduationDate || !major || !gpa || !city) {
       Alert.alert('Missing fields', 'Please fill in all fields.')
       return
     }
-    // Here you would send the data to your backend
-    Alert.alert('Registration Complete', 'Thank you for registering!')
-    router.replace('/(home)/')
+    try {
+      // Combine params from previous screen with new details
+      const payload = {
+        email: params.email,
+        password: params.password,
+        first_name: params.first_name,
+        last_name: params.last_name,
+        dob,
+        graduation_date: graduationDate,
+        major,
+        gpa,
+        city,
+      }
+      await axiosBackendInstance.post('users/guests/', payload)
+      Alert.alert('Registration Complete', 'Thank you for registering!')
+      router.replace('/(home)/')
+    } catch (error) {
+      console.error('Registration error:', error)
+      Alert.alert('Registration failed', 'Please check your details and try again.')
+    }
   }
 
   return (
