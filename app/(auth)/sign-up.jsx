@@ -1,110 +1,148 @@
-import * as React from 'react'
-import { Text, TextInput, TouchableOpacity, View } from 'react-native'
-import { Link, useRouter } from 'expo-router'
+import { Text, TextInput, View, Image, StyleSheet, Dimensions, Modal, Alert } from 'react-native'
+import React from 'react'
+import { useLoadingStore, useAuthStore } from '../../store'
+import axiosBackendInstance from '../../api/axios'
+import CustomButton from '../components/CustomButton'
+import { COLORS, FONT_SIZES } from '../constants/theme'
+import { useRouter } from 'expo-router'
+
+const { width } = Dimensions.get('window')
+
 export default function SignUpScreen() {
+  const { isLoaded, setLoading } = useLoadingStore((state) => state)
   const router = useRouter()
-  const signUp = false
-  const setActive = false
-  const isLoaded = false
+  const userContext = useAuthStore((state) => state)
 
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
-  const [pendingVerification, setPendingVerification] = React.useState(false)
-  const [code, setCode] = React.useState('')
+  const [confirmPassword, setConfirmPassword] = React.useState('')
+  const [firstName, setFirstName] = React.useState('')
+  const [lastName, setLastName] = React.useState('')
 
-  // Handle submission of sign-up form
   const onSignUpPress = async () => {
-    if (!isLoaded) return
-
-    // Start sign-up process using email and password provided
+    if (!emailAddress || !password || !confirmPassword || !firstName || !lastName) {
+      Alert.alert('Missing fields', 'Please fill in all fields.')
+      return
+    }
+    if (password !== confirmPassword) {
+      Alert.alert('Password mismatch', 'Passwords do not match.')
+      return
+    }
+    setLoading(true)
     try {
-      await signUp.create({
-        emailAddress,
+      // Register user
+      await axiosBackendInstance.post('accounts/auth/users/', {
+        email: emailAddress,
         password,
+        first_name: firstName,
+        last_name: lastName,
       })
-
-      // Send user an email with verification code
-      await signUp.prepareEmailAddressVerification({ strategy: 'email_code' })
-
-      // Set 'pendingVerification' to true to display second form
-      // and capture OTP code
-      setPendingVerification(true)
-    } catch (err) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
-      console.error(JSON.stringify(err, null, 2))
+      // Optionally, you can auto-login here or just redirect to details page
+      router.replace('/sign-up-details')
+    } catch (error) {
+      console.error('Registration error:', error)
+      Alert.alert('Registration failed', 'Please check your details and try again.')
+    } finally {
+      setLoading(false)
     }
-  }
-
-  // Handle submission of verification form
-  const onVerifyPress = async () => {
-    if (!isLoaded) return
-
-    try {
-      // Use the code the user provided to attempt verification
-      const signUpAttempt = await signUp.attemptEmailAddressVerification({
-        code,
-      })
-
-      // If verification was completed, set the session to active
-      // and redirect the user
-      if (signUpAttempt.status === 'complete') {
-        await setActive({ session: signUpAttempt.createdSessionId })
-        router.replace('/')
-      } else {
-        // If the status is not complete, check why. User may need to
-        // complete further steps.
-        console.error(JSON.stringify(signUpAttempt, null, 2))
-      }
-    } catch (err) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
-      console.error(JSON.stringify(err, null, 2))
-    }
-  }
-
-  if (pendingVerification) {
-    return (
-      <>
-        <Text>Verify your email</Text>
-        <TextInput
-          value={code}
-          placeholder="Enter your verification code"
-          onChangeText={(code) => setCode(code)}
-        />
-        <TouchableOpacity onPress={onVerifyPress}>
-          <Text>Verify</Text>
-        </TouchableOpacity>
-      </>
-    )
   }
 
   return (
-    <View>
-      <>
-        <Text>Sign up</Text>
-        <TextInput
-          autoCapitalize="none"
-          value={emailAddress}
-          placeholder="Enter email"
-          onChangeText={(email) => setEmailAddress(email)}
+    <View style={styles.page}>
+      <View style={styles.imageContainer}>
+        <Image
+          source={require('@/assets/images/ColoredLogobanner1to1.png')}
+          style={styles.image}
         />
-        <TextInput
-          value={password}
-          placeholder="Enter password"
-          secureTextEntry={true}
-          onChangeText={(password) => setPassword(password)}
-        />
-        <TouchableOpacity onPress={onSignUpPress}>
-          <Text>Continue</Text>
-        </TouchableOpacity>
-        <View style={{ display: 'flex', flexDirection: 'row', gap: 3 }}>
-          <Text>Already have an account?</Text>
-          <Link href="/sign-in">
-            <Text>Sign in</Text>
-          </Link>
+      </View>
+      <Modal visible={true} transparent={true} animationType="slide">
+        <View style={styles.modalView}>
+          <Text style={styles.title}>Register as Guest</Text>
+          <TextInput
+            style={styles.input}
+            autoCapitalize="none"
+            value={emailAddress}
+            placeholder="Enter email"
+            onChangeText={setEmailAddress}
+          />
+          <TextInput
+            style={styles.input}
+            value={firstName}
+            placeholder="First name"
+            onChangeText={setFirstName}
+          />
+          <TextInput
+            style={styles.input}
+            value={lastName}
+            placeholder="Last name"
+            onChangeText={setLastName}
+          />
+          <TextInput
+            style={styles.input}
+            value={password}
+            placeholder="Enter password"
+            secureTextEntry={true}
+            onChangeText={setPassword}
+          />
+          <TextInput
+            style={styles.input}
+            value={confirmPassword}
+            placeholder="Confirm password"
+            secureTextEntry={true}
+            onChangeText={setConfirmPassword}
+          />
+          <View style={styles.button}>
+            <CustomButton text="Continue" color={COLORS.red} fontSize={FONT_SIZES.medium} buttonHandler={onSignUpPress} />
+          </View>
         </View>
-      </>
+      </Modal>
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  page: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
+  imageContainer: {
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+    flex: 1.5,
+    backgroundColor: 'white',
+  },
+  image: {
+    width: width,
+    height: 400,
+  },
+  modalView: {
+    position: 'absolute',
+    bottom: 0,
+    height: '60%',
+    width: width,
+    backgroundColor: '#dddddd',
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
+    padding: 20,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  input: {
+    width: '100%',
+    height: 50,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+  },
+  button: {
+    width: '80%',
+  },
+})

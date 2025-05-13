@@ -13,7 +13,6 @@ import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, Eas
 
 
 const { width } = Dimensions.get("window");
-const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 export default function ClockInOutScreen() {
   const [currentDate, setCurrentDate] = useState("");
