@@ -71,6 +71,15 @@ const screensConfig = [
     buttonLabel: "Request Leave"
   },
   {
+    name: "Guest Events",
+    component: require('../guest-events.jsx').default,
+    title: "Upcoming Events",
+    allowedRoles: ["guest"],
+    showButton: true,
+    icon: { type: MaterialCommunityIcons, name: "calendar", color: "#ac0808", size: 30 },
+    buttonLabel: "View Events"
+  },
+  {
     name: "Logout",
     component: LogoutScreen,
     title: "Logout",
