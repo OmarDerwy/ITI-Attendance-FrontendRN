@@ -11,7 +11,6 @@ export default function Page() {
   const { isSignedIn, first_name, last_name, email } = useAuthStore((state) => state)
   const router = useRouter()
   console.log(`ENV:`, process.env.EXPO_PUBLIC_BACKEND_URL)
-  console.log(`ENV:`, process.env)
   console.log(`Welcome ${first_name} ${last_name}`)
   console.log(`Email: ${email}`)
   console.log(`isSignedIn: ${isSignedIn}`)
@@ -41,9 +40,12 @@ export default function Page() {
             />
           </View>
           <View style={styles.buttonContainer}>
-            <Text style={styles.text}>Welcome the ITI official app! Please note that you need to be a current student in order to proceed ✌️</Text>
+            <Text style={styles.text}>Welcome the ITI official app! ✌️</Text>
             <View style={styles.buttonWrapper}>
               <CustomButton text="Sign In" color={COLORS.red} fontSize={FONT_SIZES.large} buttonHandler={handleNavigateToSignIn} />
+            </View>
+            <View style={styles.buttonWrapper}>
+              <CustomButton text="Register as Guest" color={COLORS.red} fontSize={FONT_SIZES.large} buttonHandler={() => router.push('/sign-up')} />
             </View>
           </View>
         </View>
@@ -86,6 +88,7 @@ const styles = StyleSheet.create({
   },
   buttonWrapper: {
     width: '80%',
+    marginBottom: 20,
   },
   welcomeText: {
     fontSize: 20,

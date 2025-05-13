@@ -7,10 +7,9 @@ import {
   StyleSheet,
   ImageBackground,
   TouchableOpacity,
-  Image,
   Dimensions
 } from "react-native";
-import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import CustomDrawerNavigator from "../../components/CustomDrawerNavigator";
 import ClockInOutScreen from "../attendance";
 import ReportScreen from "../report";
@@ -19,8 +18,75 @@ import { useAuthStore } from '@/store/index';
 import LeaveRequestScreen from "../leave-request";
 import LeaveRequestCenter from "../leave-requests-center";
 
-const Drawer = createDrawerNavigator();
 const { width, height } = Dimensions.get("window");
+
+function isAllowed(allowedRoles, role) {
+  if (allowedRoles === "all") return true;
+  return Array.isArray(allowedRoles) && allowedRoles.includes(role);
+}
+
+// Unified config for screens and buttons
+const screensConfig = [
+  {
+    name: "Home",
+    component: null, // HomeScreen will be injected below
+    title: "Home",
+    allowedRoles: "all",
+    showButton: false
+  },
+  {
+    name: "Clock In/Out",
+    component: ClockInOutScreen,
+    title: "Clock In/Out",
+    allowedRoles: ["student", "guest"],
+    showButton: true,
+    icon: { type: MaterialCommunityIcons, name: "fingerprint", color: "#ac0808", size: 30 },
+    buttonLabel: "Clock In/Out"
+  },
+  {
+    name: "Leave Requests Center",
+    component: LeaveRequestCenter,
+    title: "Leave Requests Center",
+    allowedRoles: ["supervisor", "coordinator"],
+    showButton: true,
+    icon: { type: MaterialIcons, name: "assignment", color: "#ac0808", size: 30 },
+    buttonLabel: "Leave Requests Center"
+  },
+  {
+    name: "Report Found/Lost Item",
+    component: ReportScreen,
+    title: "Report Found/Lost Item",
+    allowedRoles: "all",
+    showButton: true,
+    icon: { type: MaterialIcons, name: "report-problem", color: "#ac0808", size: 30 },
+    buttonLabel: "Report Found/Lost Item"
+  },
+  {
+    name: "Leave Request",
+    component: LeaveRequestScreen,
+    title: "Request Leave",
+    allowedRoles: ["student"],
+    showButton: true,
+    icon: { type: MaterialIcons, name: "event-busy", color: "#ac0808", size: 30 },
+    buttonLabel: "Request Leave"
+  },
+  {
+    name: "Guest Events",
+    component: require('../guest-events.jsx').default,
+    title: "Upcoming Events",
+    allowedRoles: ["guest"],
+    showButton: true,
+    icon: { type: MaterialCommunityIcons, name: "calendar", color: "#ac0808", size: 30 },
+    buttonLabel: "View Events"
+  },
+  {
+    name: "Logout",
+    component: LogoutScreen,
+    title: "Logout",
+    allowedRoles: "all",
+    showButton: false
+  }
+];
 
 function HomeScreen({ navigation }) {
   const { first_name } = useAuthStore((state) => state.first_name);
@@ -47,56 +113,35 @@ function HomeScreen({ navigation }) {
           </View>
         </View>
         <View style={styles.content}>
-
-          { role == "student" && <TouchableOpacity style={styles.actionButton}
-          onPress={() => navigation.navigate("Clock In/Out")}
-          >
-            <MaterialCommunityIcons name="fingerprint" size={30} color="#ac0808" />
-            <Text style={styles.actionLabel}>Clock In/Out</Text>
-          </TouchableOpacity>}
-
-          { role == "supervisor" && <TouchableOpacity style={styles.actionButton}
-            onPress={() => navigation.navigate("Leave Requests Center")}>
-            <MaterialIcons name="assignment" size={30} color="#ac0808" />
-            <Text style={styles.actionLabel}>Leave Requests Center</Text>
-          </TouchableOpacity>}
-
-          <TouchableOpacity style={styles.actionButton}
-            onPress={() => navigation.navigate("Report Found/Lost Item")}>
-            <MaterialIcons name="report-problem" size={30} color="#ac0808" />
-            <Text style={styles.actionLabel}>Report Found/Lost Item</Text>
-          </TouchableOpacity>
-          
-          { role == "student" && <TouchableOpacity style={styles.actionButton}
-            onPress={() => navigation.navigate("Leave Request")}>
-            <MaterialIcons name="event-busy" size={30} color="#ac0808" />
-            <Text style={styles.actionLabel}>Request Leave</Text>
-          </TouchableOpacity>}
-        </View >
+          {screensConfig.filter(s => s.showButton && isAllowed(s.allowedRoles, role)).map(screen => (
+            <TouchableOpacity
+              key={screen.name}
+              style={styles.actionButton}
+              onPress={() => navigation.navigate(screen.name)}
+            >
+              {screen.icon && (
+                <screen.icon.type
+                  name={screen.icon.name}
+                  size={screen.icon.size}
+                  color={screen.icon.color}
+                />
+              )}
+              <Text style={styles.actionLabel}>{screen.buttonLabel}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
     </ImageBackground>
   );
 }
 
+// Inject HomeScreen as the component for Home
+screensConfig[0].component = HomeScreen;
+
 export default function App() {
   const { role } = useAuthStore((state) => state.role);
-  const screens = [
-    { name: "Home", component: HomeScreen, title: "Home" },
-    { name: "Clock In/Out", component: ClockInOutScreen, title: "Clock In/Out" },
-    { name: "Leave Requests Center", component: LeaveRequestCenter, title: "Leave Requests Center" },
-    { name: "Report Found/Lost Item", component: ReportScreen, title: "Report Found/Lost Item" },
-    { name: "Leave Request", component: LeaveRequestScreen, title: "Request Leave" },
-    { name: "Logout", component: LogoutScreen, title: "Logout" },
-  ];
-
-  if (role !== "student") {
-    screens.splice(1, 1); // Remove Clock In/Out for non-students
-    screens.splice(3, 1); // Remove Leave Request for non-students
-  }
-  if (role !== "supervisor") {
-    screens.splice(2, 1); // Remove Leave Requests Center for non-supervisors
-  }
-
+  // Only include screens allowed for the current role
+  const screens = screensConfig.filter(s => isAllowed(s.allowedRoles, role));
   return <CustomDrawerNavigator screens={screens} />;
 }
 
@@ -107,7 +152,6 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    // backgroundColor: "rgba(0, 0, 0, 0.5)",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "space-around",
@@ -163,7 +207,6 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     marginTop: 5,
   },
- 
   actionButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -173,39 +216,10 @@ const styles = StyleSheet.create({
     width: "98%",
     elevation: 5,
   },
-  buttonWrapper: {
-    alignItems: "center",
-  },
-  checkInButton: {
-    backgroundColor: "green",
-    padding: 15,
-    borderRadius: 30,
-    alignItems: "center",
-    justifyContent: "center",
-    marginHorizontal: 10,
-  },
-  checkOutButton: {
-    backgroundColor: "red",
-    padding: 15,
-    borderRadius: 30,
-    alignItems: "center",
-    justifyContent: "center",
-    marginHorizontal: 10,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 14,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginTop: 5,
-  },
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  text: {
-    fontSize: 20,
+  actionLabel: {
+    marginLeft: 10,
+    fontSize: 16,
+    color: "#ac0808",
     fontWeight: "bold",
   },
 });
