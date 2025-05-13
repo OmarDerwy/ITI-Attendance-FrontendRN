@@ -11,7 +11,6 @@ export default function Page() {
   const { isSignedIn, first_name, last_name, email } = useAuthStore((state) => state)
   const router = useRouter()
   console.log(`ENV:`, process.env.EXPO_PUBLIC_BACKEND_URL)
-  console.log(`ENV:`, process.env)
   console.log(`Welcome ${first_name} ${last_name}`)
   console.log(`Email: ${email}`)
   console.log(`isSignedIn: ${isSignedIn}`)
