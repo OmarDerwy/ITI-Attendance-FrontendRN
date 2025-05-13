@@ -17,6 +17,7 @@ import LogoutScreen from "../logout";
 import { useAuthStore } from '@/store/index';
 import LeaveRequestScreen from "../leave-request";
 import LeaveRequestCenter from "../leave-requests-center";
+import GuestEventsScreen from "../guest-events";
 
 const { width, height } = Dimensions.get("window");
 
@@ -72,7 +73,7 @@ const screensConfig = [
   },
   {
     name: "Guest Events",
-    component: require('../guest-events.jsx').default,
+    component: GuestEventsScreen,
     title: "Upcoming Events",
     allowedRoles: ["guest"],
     showButton: true,

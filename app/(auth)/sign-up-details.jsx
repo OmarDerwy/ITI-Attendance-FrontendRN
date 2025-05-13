@@ -35,7 +35,7 @@ export default function SignUpDetails() {
         gpa,
         city,
       }
-      await axiosBackendInstance.post('users/guests/', payload)
+      await axiosBackendInstance.post('accounts/guests/', payload)
       Alert.alert('Registration Complete', 'Thank you for registering!')
       router.replace('/(home)/')
     } catch (error) {

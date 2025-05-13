@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import axios from '../../api/axios';
 import CustomButton from '../../components/CustomButton';
-import { COLORS, FONT_SIZES } from '../../components/constants/theme';
+import { COLORS, FONT_SIZES } from '../../constants/theme';
 
 export default function GuestEventsScreen() {
   const [events, setEvents] = useState([]);
@@ -12,14 +11,14 @@ export default function GuestEventsScreen() {
 
   useEffect(() => {
     const fetchEvents = async () => {
-      try {
-        const response = await axios.get('/api/guest/events/');
-        setEvents(response.data);
-      } catch (error) {
-        Alert.alert('Error', 'Failed to load events.');
-      } finally {
-        setLoading(false);
-      }
+    //   try {
+    //     const response = await axios.get('/api/guest/events/');
+    //     setEvents(response.data);
+    //   } catch (error) {
+    //     Alert.alert('Error', 'Failed to load events.');
+    //   } finally {
+    //     setLoading(false);
+    //   }
     };
     fetchEvents();
   }, []);
