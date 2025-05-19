@@ -1,4 +1,4 @@
-import { Link, useRouter } from 'expo-router'
+import { useRouter } from 'expo-router'
 import { Text, TextInput, TouchableOpacity, View, Image, StyleSheet, Dimensions, Modal, Alert } from 'react-native'
 import React, { useContext } from 'react'
 import { useLoadingStore, useAuthStore } from '../../store'
@@ -14,7 +14,6 @@ export default function Page() {
   const { isLoaded, setLoading } = useLoadingStore((state) => state)
   const router = useRouter()
   const userContext = useAuthStore((state) => state)
-
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
 
@@ -74,7 +73,7 @@ export default function Page() {
       setLoading(false);
     }
   }
-  
+
   return (
     <View style={styles.page}>
       <View style={styles.imageContainer}>
@@ -101,7 +100,7 @@ export default function Page() {
             onChangeText={(password) => setPassword(password)}
           />
           <View style={styles.button}>
-            <CustomButton text="Continue" color={COLORS.red} fontSize={FONT_SIZES.medium} buttonHandler={onSignInPress} />
+            <CustomButton text="Continue" color={COLORS.red} fontSize={FONT_SIZES.medium} buttonHandler={onSignInPress} disabled={isLoaded} />
           </View>
         </View>
       </Modal>

@@ -6,15 +6,17 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  Alert
+  Alert,
+  RefreshControl
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { TextInput } from "react-native-gesture-handler";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import dayjs from "dayjs";
 import axiosBackendInstance from "@/api/axios";
 import { TimePickerModal } from "react-native-paper-dates";
+import { COLORS, FONT_SIZES } from "../../constants/theme";
+import CustomButton from "../../components/CustomButton";
 
 const requestTypeOptions = [
   { label: "Day Excuse", value: "day_excuse" },
@@ -37,10 +39,10 @@ export default function LeaveRequestScreen() {
   const [selectedTime, setSelectedTime] = useState(new Date());
 
   // Fetch upcoming records
-  const { data: upcomingRecords, isLoading, error } = useQuery({
-    queryKey: ["upcomingRecords"],
+  const { data: upcomingRecords, isLoading, error, refetch } = useQuery({
+    queryKey: ["upcomingRecordsgt"],
     queryFn: async () => {
-      const response = await axiosBackendInstance.get(`attendance/upcoming-records/`);
+      const response = await axiosBackendInstance.get(`attendance/upcoming-records-gt/`);
       return response.data;
     },
     refetchOnMount: true,
@@ -120,7 +122,7 @@ export default function LeaveRequestScreen() {
       </View>
     );
   }
-
+  
   if (error) {
     return (
       <View style={styles.errorContainer}>
@@ -128,9 +130,10 @@ export default function LeaveRequestScreen() {
       </View>
     );
   }
+  
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} refreshControl={<RefreshControl refreshing={isLoading} onRefresh={async () => {await refetch()}} colors={[COLORS.red]} />}>
       <View style={styles.header}>
         <Text style={styles.title}>Submit Leave Request</Text>
       </View>
@@ -202,17 +205,15 @@ export default function LeaveRequestScreen() {
           </View>
         )}
 
-        <TouchableOpacity 
-          style={styles.submitButton} 
-          onPress={handleSubmit}
-          disabled={submitLeaveRequest.isLoading}
-        >
-          {submitLeaveRequest.isLoading ? (
-            <ActivityIndicator size="small" color="#fff" />
-          ) : (
-            <Text style={styles.submitButtonText}>Submit Request</Text>
-          )}
-        </TouchableOpacity>
+        <View style={{ marginTop: 20 }}>
+          <CustomButton
+            text={"Submit Request"}
+            color={COLORS.red}
+            fontSize={FONT_SIZES.medium}
+            buttonHandler={handleSubmit}
+            disabled={submitLeaveRequest.isLoading}
+          />
+        </View>
       </View>
     </ScrollView>
   );
