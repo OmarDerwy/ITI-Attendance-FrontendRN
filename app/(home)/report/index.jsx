@@ -15,7 +15,9 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons } from "@expo/vector-icons";
 import axios from "axios";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosBackendInstance from '../../../api/axios'
+import CustomButton from "../../components/CustomButton";
 
 const { width } = Dimensions.get("window");
 
@@ -30,6 +32,7 @@ export default function ReportScreen() {
   const [dropdownVisible, setDropdownVisible] = useState(false)
 
   const statusOptions = ["LOST", "FOUND"];
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     (async () => {
@@ -70,88 +73,66 @@ export default function ReportScreen() {
     setImage(null);
   };
 
-  // const handleTimeChange = (event, selectedTime) => {
-  //   setShowTimePicker(false); // Hide the time picker
-  //   if (selectedTime) {
-  //     setTime(selectedTime); // Update the time state
-  //   }
-  // };
+  const reportMutation = useMutation({
+    mutationFn: async ({ name, description, place, status, time, image }) => {
+      let imageUrl = null;
+      if (image) {
+        const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${process.env.EXPO_PUBLIC_CLOUDINARY_NAME}/upload`;
+        const formData = new FormData();
+        formData.append("file", {
+          uri: image,
+          type: "image/jpeg",
+          name: "item-image.jpg",
+        });
+        formData.append("upload_preset", process.env.EXPO_PUBLIC_CLOUDINARY_PRESET);
+        formData.append("cloud_name", process.env.EXPO_PUBLIC_CLOUDINARY_NAME);
+        try {
+          const cloudinaryResponse = await axios.post(cloudinaryUrl, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+          imageUrl = cloudinaryResponse.data.secure_url;
+        } catch (error) {
+          throw new Error("Failed to upload image to Cloudinary.");
+        }
+      }
+      const payload = {
+        name,
+        description,
+        place,
+        time: time.toISOString(),
+        status,
+      };
+      if (imageUrl) payload.image = imageUrl;
+      const apiEndpoint = status === "FOUND"
+        ? "lost-and-found/found-items/"
+        : "lost-and-found/lost-items/";
+      const response = await axiosBackendInstance.post(apiEndpoint, payload);
+      return response;
+    },
+    onSuccess: (response) => {
+      Alert.alert("Success", "Item reported successfully!");
+      setName("");
+      setDescription("");
+      setPlace("");
+      setStatus("LOST");
+      setImage(null);
+      // Optionally invalidate or refetch queries here
+    },
+    onError: (error) => {
+      Alert.alert("Error", error.message || "An error occurred");
+    },
+  });
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!name || !description || !place) {
       Alert.alert("Error", "Please fill in all required fields.");
       return;
     }
-
     if (status === "FOUND" && !image) {
       Alert.alert("Error", "Please upload an image for found items.");
       return;
     }
-
-    let imageUrl = null;
-
-    if (image) {
-      const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${process.env.EXPO_PUBLIC_CLOUDINARY_NAME}/upload`;
-      const formData = new FormData();
-      formData.append("file", {
-        uri: image,
-        type: "image/jpeg",
-        name: "item-image.jpg",
-      });
-      formData.append("upload_preset", process.env.EXPO_PUBLIC_CLOUDINARY_PRESET);
-      formData.append("cloud_name", process.env.EXPO_PUBLIC_CLOUDINARY_NAME);
-
-      try {
-        const cloudinaryResponse = await axios.post(cloudinaryUrl, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-
-        imageUrl = cloudinaryResponse.data.secure_url; 
-        console.log("Image uploaded to Cloudinary:", imageUrl);
-      } catch (error) {
-        Alert.alert("Error", "Failed to upload image to Cloudinary.");
-        console.error("Cloudinary upload error:", error.response?.data || error.message);
-        return;
-      }
-    }
-
-    const payload = {
-      name,
-      description,
-      place,
-      time: time.toISOString(),
-      status,
-    };
-
-    if (imageUrl) {
-      payload.image = imageUrl;
-    }
-
-    const apiEndpoint =
-      status === "FOUND"
-        ? "lost-and-found/found-items/"
-        : "lost-and-found/lost-items/";
-
-    // console.log("API Endpoint:", apiEndpoint);
-    try {
-      const response = await axiosBackendInstance.post(apiEndpoint, payload);
-
-      if (response.status === 200 || response.status === 201) {
-        Alert.alert("Success", "Item reported successfully!");
-        setName("");
-        setDescription("");
-        setPlace("");
-        setStatus("LOST");
-        setImage(null);
-      } else {
-        Alert.alert("Error", `Failed to report the item: ${response.statusText}`);
-      }
-    } catch (error) {
-      Alert.alert("Error", `An error occurred: ${error.message}`);
-      console.error("Error submitting form:", error);
-    }
+    reportMutation.mutate({ name, description, place, status, time, image });
   };
 
   return (
@@ -233,9 +214,7 @@ export default function ReportScreen() {
         </View>
       )}
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitButtonText}>Submit</Text>
-      </TouchableOpacity>
+      <CustomButton text="Submit Report" buttonHandler={handleSubmit} disabled={reportMutation.isPending} />
     </ScrollView>
   );
 }
