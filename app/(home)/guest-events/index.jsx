@@ -3,24 +3,38 @@ import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, 
 import { useRouter } from 'expo-router';
 import CustomButton from '../../components/CustomButton';
 import { COLORS, FONT_SIZES } from '../../constants/theme';
+import { RefreshControl } from 'react-native-gesture-handler';
 
 export default function GuestEventsScreen() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const fetchEvents = async () => {
-    //   try {
-    //     const response = await axios.get('/api/guest/events/');
-    //     setEvents(response.data);
-    //   } catch (error) {
-    //     Alert.alert('Error', 'Failed to load events.');
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    };
-    fetchEvents();
+    // Mock data for development/demo
+    const mockEvents = [
+      {
+        id: 1,
+        name: 'Welcome Mixer',
+        description: 'Meet other guests and enjoy refreshments.',
+        date: '2025-06-01T18:00:00Z',
+      },
+      {
+        id: 2,
+        name: 'Tech Talk: The Future of AI',
+        description: 'A talk on AI trends and applications.',
+        date: '2025-06-05T14:00:00Z',
+      },
+      {
+        id: 3,
+        name: 'Community Picnic',
+        description: 'Join us for food, games, and fun in the park.',
+        date: '2025-06-10T12:00:00Z',
+      },
+    ];
+    setEvents(mockEvents);
+    setLoading(false);
   }, []);
 
   const handleRegister = (event) => {
@@ -59,6 +73,19 @@ export default function GuestEventsScreen() {
         renderItem={renderItem}
         contentContainerStyle={styles.list}
         ListEmptyComponent={<Text>No upcoming events found.</Text>}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => {
+              setRefreshing(true);
+              // Simulate a network request
+              setTimeout(() => {
+                setRefreshing(false);
+              }, 2000);
+            }}
+            colors={[COLORS.red]}
+          />
+        }
       />
     </View>
   );
