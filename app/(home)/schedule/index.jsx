@@ -1,11 +1,12 @@
-import React, { useMemo } from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { Agenda } from "react-native-calendars";
-import { useQuery } from "@tanstack/react-query";
+import React, { useMemo, useState } from "react";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { ExpandableCalendar, Timeline, CalendarProvider } from "react-native-calendars";
 import axiosBackendInstance from "../../../api/axios";
 import { useNavigation } from "@react-navigation/native";
 import { TouchableOpacity } from "react-native";
 import { useAuthStore } from '@/store/index';
+import { useQuery } from "@tanstack/react-query";
+
 
 function useLectureSessions(enabled) {
   return useQuery({
@@ -31,7 +32,7 @@ function useEventSessions(enabled) {
         {
           title: "Python Workshop",
           description: "Learn Python basics",
-          event_date: "2024-05-20",
+          event_date: "2025-05-20",
           audience_type: "both",
           is_mandatory: true,
           target_track_ids: [1],
@@ -39,15 +40,15 @@ function useEventSessions(enabled) {
             {
               title: "Introduction to Python",
               speaker: "John Doe",
-              start_time: "2024-05-20T09:00:00Z",
-              end_time: "2024-05-20T10:30:00Z",
+              start_time: "2025-05-20T09:00:00Z",
+              end_time: "2025-05-20T10:30:00Z",
               description: "Basic Python syntax and concepts",
             },
             {
               title: "Advanced Python Features",
               speaker: "Jane Smith",
-              start_time: "2024-05-20T11:00:00Z",
-              end_time: "2024-05-20T12:30:00Z",
+              start_time: "2025-05-20T11:00:00Z",
+              end_time: "2025-05-20T12:30:00Z",
               description: "Decorators, generators, and context managers",
             },
           ],
@@ -115,60 +116,129 @@ export default function ScheduleScreen() {
   const { data: lecturesRaw = [], isLoading: loadingLectures } = useLectureSessions(showLectures);
   const { data: eventsRaw = [], isLoading: loadingEvents } = useEventSessions(showEvents);
 
-  const agendaItems = useMemo(() => {
-    let items = {};
+  const [selectedDate, setSelectedDate] = useState(() => {
+    // Default to today in YYYY-MM-DD
+    const d = new Date();
+    return d.toISOString().slice(0, 10);
+  });
+
+  // Combine and flatten all events for Timeline
+  const allEvents = useMemo(() => {
+    let items = [];
     if (showLectures && lecturesRaw) {
-      items = { ...items, ...transformLecturesToAgenda(lecturesRaw) };
+      items = items.concat(
+        lecturesRaw.map((l) => ({
+          id: `lecture-${l.id}`,
+          type: "lecture",
+          title: l.title,
+          instructor: l.instructor,
+          is_online: l.is_online,
+          start: l.start,
+          end: l.end,
+          branch: l.branch,
+          schedule_id: l.schedule_id,
+          schedule_date: l.schedule_date,
+          description: l.title,
+        }))
+      );
     }
     if (showEvents && eventsRaw) {
-      const eventAgenda = transformEventsToAgenda(eventsRaw);
-      Object.keys(eventAgenda).forEach((date) => {
-        if (!items[date]) items[date] = [];
-        items[date] = [...items[date], ...eventAgenda[date]];
+      eventsRaw.forEach((ev, idx) => {
+        // Add wrapper event
+        if (ev.sessions && ev.sessions.length > 0) {
+          const sorted = [...ev.sessions].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+          items.push({
+            id: `event-${idx}`,
+            type: "event",
+            title: ev.title,
+            description: ev.description,
+            start: sorted[0].start_time,
+            end: sorted[sorted.length - 1].end_time,
+            event_date: ev.event_date,
+            is_mandatory: ev.is_mandatory,
+            audience_type: ev.audience_type,
+          });
+          // Add each session as its own event
+          ev.sessions.forEach((session, sidx) => {
+            items.push({
+              id: `event-${idx}-session-${sidx}`,
+              type: "event-session",
+              title: session.title + ` (${ev.title})`,
+              description: session.description,
+              start: session.start_time,
+              end: session.end_time,
+              event_date: ev.event_date,
+              speaker: session.speaker,
+            });
+          });
+        }
       });
     }
     return items;
   }, [lecturesRaw, eventsRaw, showLectures, showEvents]);
 
+  // Filter events for selected date
+  const eventsForSelectedDate = useMemo(() => {
+    return allEvents.filter(ev => {
+      const dateStr = (ev.schedule_date || ev.event_date || ev.start || "").slice(0, 10);
+      return dateStr === selectedDate;
+    }).map(ev => ({
+      ...ev,
+      start: new Date(ev.start),
+      end: new Date(ev.end),
+      title: ev.title,
+      summary: ev.description,
+    }));
+  }, [allEvents, selectedDate]);
+
   return (
     <View style={styles.container}>
-      <Agenda
-        items={agendaItems}
-        renderItem={(item) => (
-          <TouchableOpacity
-            style={styles.item}
-            // onPress={() => {
-            //   if (item.type === "event")
-            //     navigation.navigate("EventDetails", { event: item });
-            // }}
-          >
-            <Text style={{ fontWeight: "bold" }}>{item.title}</Text>
-            {item.type === "lecture" ? (
-              <Text>Instructor: {item.instructor}</Text>
-            ) : null}
-            {item.type === "event" ? (
-              <Text>{item.description}</Text>
-            ) : null}
-            <Text>
-              {new Date(item.start).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-              {" - "}
-              {new Date(item.end).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </Text>
-          </TouchableOpacity>
-        )}
-        renderEmptyDate={() => (
-          <View style={styles.emptyDate}>
-            <Text>No events</Text>
-          </View>
-        )}
-        refreshing={loadingLectures || loadingEvents}
-      />
+      <CalendarProvider date={selectedDate}>
+        <ExpandableCalendar
+          onDayPress={day => setSelectedDate(day.dateString)}
+          markedDates={{ [selectedDate]: { selected: true } }}
+          initialPosition="open"
+        />
+        <ScrollView >
+          {/* DEBUG: Show raw events for the selected date */}
+          {eventsForSelectedDate.length === 0 ? (
+            <View style={styles.emptyDate}>
+              <Text>No events</Text>
+            </View>
+          ) : null}
+          {/* DEBUG: Show event titles for verification */}
+          {eventsForSelectedDate.length > 0 && (
+            <View style={{ padding: 10 }}>
+              <Text style={{ fontWeight: 'bold' }}>Events for {selectedDate}:</Text>
+              {eventsForSelectedDate.map(ev => (
+                <Text key={ev.id}>{ev.title} ({ev.start.toLocaleTimeString()} - {ev.end.toLocaleTimeString()})</Text>
+              ))}
+            </View>
+          )}
+          <Timeline
+            events={eventsForSelectedDate}
+            showNowIndicator
+            style={{ minHeight: 400 }}
+            renderEvent={event => (
+              <TouchableOpacity
+                style={styles.item}
+              >
+                <Text style={{ fontWeight: "bold" }}>{event.title}</Text>
+                {event.type === "lecture" && event.instructor ? (
+                  <Text>Instructor: {event.instructor}</Text>
+                ) : null}
+                {event.speaker ? <Text>Speaker: {event.speaker}</Text> : null}
+                <Text>
+                  {event.start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  {" - "}
+                  {event.end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                </Text>
+                {event.summary ? <Text>{event.summary}</Text> : null}
+              </TouchableOpacity>
+            )}
+          />
+        </ScrollView>
+      </CalendarProvider>
     </View>
   );
 }

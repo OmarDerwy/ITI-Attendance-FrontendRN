@@ -18,6 +18,7 @@ import { useAuthStore } from '@/store/index';
 import LeaveRequestScreen from "../leave-request";
 import LeaveRequestCenter from "../leave-requests-center";
 import GuestEventsScreen from "../guest-events";
+import ScheduleScreen from "../schedule";
 // import EventDetailsScreen from "./event-details";
 
 const { width, height } = Dimensions.get("window");
@@ -83,7 +84,7 @@ const screensConfig = [
   },
   {
     name: "Schedule",
-    component: require("../schedule").default,
+    component: ScheduleScreen,
     title: "Schedule",
     allowedRoles: ["student", "guest"],
     showButton: true,
