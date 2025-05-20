@@ -18,6 +18,7 @@ import { useAuthStore } from '@/store/index';
 import LeaveRequestScreen from "../leave-request";
 import LeaveRequestCenter from "../leave-requests-center";
 import GuestEventsScreen from "../guest-events";
+import GeneralScheduleScreen from "../schedule";
 
 const { width, height } = Dimensions.get("window");
 
@@ -86,7 +87,16 @@ const screensConfig = [
     title: "Logout",
     allowedRoles: "all",
     showButton: false
-  }
+  },
+  {
+    name: "Schedule",
+    component: GeneralScheduleScreen,
+    title: "Schedule",
+    allowedRoles: ["student", "guest"],
+    icon: { type: MaterialCommunityIcons, name: "calendar-month", color: "#ac0808", size: 30 },
+    showButton: true,
+    buttonLabel: "View Schedule"
+  },
 ];
 
 function HomeScreen({ navigation }) {
