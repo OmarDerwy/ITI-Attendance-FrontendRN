@@ -18,6 +18,7 @@ import { useAuthStore } from '@/store/index';
 import LeaveRequestScreen from "../leave-request";
 import LeaveRequestCenter from "../leave-requests-center";
 import GuestEventsScreen from "../guest-events";
+// import EventDetailsScreen from "./event-details";
 
 const { width, height } = Dimensions.get("window");
 
@@ -81,12 +82,28 @@ const screensConfig = [
     buttonLabel: "View Events"
   },
   {
+    name: "Schedule",
+    component: require("../schedule").default,
+    title: "Schedule",
+    allowedRoles: ["student", "guest"],
+    showButton: true,
+    icon: { type: MaterialCommunityIcons, name: "calendar-month", color: "#ac0808", size: 30 },
+    buttonLabel: "View Schedule"
+  },
+  {
     name: "Logout",
     component: LogoutScreen,
     title: "Logout",
     allowedRoles: "all",
     showButton: false
-  }
+  },
+  // {
+  //   name: "EventDetails",
+  //   component: EventDetailsScreen,
+  //   title: "Event Details",
+  //   allowedRoles: ["student", "guest"],
+  //   showButton: false
+  // }
 ];
 
 function HomeScreen({ navigation }) {
