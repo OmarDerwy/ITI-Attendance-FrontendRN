@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ImageBackground } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ImageBackground, ScrollView, RefreshControl } from "react-native";
 import { getRandomBytes } from 'expo-crypto';
 import * as SecureStore from 'expo-secure-store';
 import * as Location from 'expo-location';
@@ -20,6 +20,7 @@ export default function ClockInOutScreen() {
   const [deviceUUID, setDeviceUUID] = useState(null);
   const [isCheckInDisabled, setIsCheckInDisabled] = useState(false); 
   const [isCheckOutDisabled, setIsCheckOutDisabled] = useState(false); 
+  const [refreshing, setRefreshing] = useState(false);
   const { first_name } = useAuthStore((state) => state.first_name);
   const { id } = useAuthStore((state) => state.id);
 
@@ -167,7 +168,7 @@ export default function ClockInOutScreen() {
   };
 
   // code to fetch the next upcoming day to be used in the check in and check out using tanstack
-  const { data: upcomingRecords, isLoading: isLoadingRecords, error } = useQuery({
+  const { data: upcomingRecords, isLoading: isLoadingRecords, error, refetch } = useQuery({
     queryKey: ["upcomingRecords"],
     queryFn: async () => {
       const response = await axiosBackendInstance.get(`attendance/upcoming-records/`);
@@ -177,6 +178,18 @@ export default function ClockInOutScreen() {
     staleTime: 0,
   });
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await refetch();
+      Toast.show({ type: "success", text1: "Upcoming schedules refreshed successfully" });
+    } catch (error) {
+      console.error("Error refreshing upcoming schedules:", error);
+      Toast.show({ type: "error", text1: "Error refreshing schedules", text2: error.message });
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const spin = useSharedValue(0);
 
@@ -197,92 +210,104 @@ export default function ClockInOutScreen() {
       source={require("../../../assets/images/el3asema2.png")}
       style={styles.background}
     >
-      <View style={styles.overlay}>
-        <View style={styles.profileSection}>
-          <View>
-            {isLoadingRecords ? (
-              <Animated.View style={animatedStyle}>
-                <MaterialCommunityIcons name="loading" size={90} color="gray" />
-              </Animated.View>
-            ) : (
-              upcomingRecords && upcomingRecords.data && upcomingRecords.data.length > 0 ? (
-                <View
-                  style={{
-                    backgroundColor: "#222",
-                    borderRadius: 10,
-                    padding: 16,
-                    width: width * 0.8,
-                    marginBottom: 10,
-                    alignItems: "flex-start",
-                  }}
-                >
-                  <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16, marginBottom: 4 }}>
-                    {upcomingRecords.data[0].schedule?.name || "Upcoming Schedule"}
-                  </Text>
-                  <Text style={{ color: "#bbb", fontSize: 14 }}>
-                    Date: {upcomingRecords.data[0].schedule?.created_at?.slice(0, 10)}
-                  </Text>
-                  <Text style={{ color: "#bbb", fontSize: 14 }}>
-                    Start: {new Date(upcomingRecords.data[0].schedule?.start_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                  </Text>
-                  <Text style={{ color: "#bbb", fontSize: 14 }}>
-                    End: {new Date(upcomingRecords.data[0].schedule?.end_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                  </Text>
-                  <Text style={{ color: "#bbb", fontSize: 14, marginTop: 4 }}>
-                    Status: {upcomingRecords.data[0].status}
-                  </Text>
-                  {(upcomingRecords.data[0].status?.includes("late-excused") && upcomingRecords.data[0].adjusted_time) && (
-                    <Text style={{ color: "#ffb300", fontSize: 14 }}>
-                      Adjusted Start: {new Date(upcomingRecords.data[0].adjusted_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                    </Text>
-                  )}
-                  {(upcomingRecords.data[0].status?.includes("early-excused") && upcomingRecords.data[0].adjusted_time) && (
-                    <Text style={{ color: "#ffb300", fontSize: 14 }}>
-                      Adjusted End: {new Date(upcomingRecords.data[0].adjusted_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                    </Text>
-                  )}
-                </View>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <View style={styles.overlay}>
+          <View style={styles.profileSection}>
+            <View>
+              {isLoadingRecords ? (
+                <Animated.View style={animatedStyle}>
+                  <MaterialCommunityIcons name="loading" size={90} color="gray" />
+                </Animated.View>
+              ) : error ? (
+                <Text style={{ color: "red" }}>Error fetching upcoming records</Text>
               ) : (
-                <MaterialCommunityIcons name="calendar-clock" size={90} color="gray" />
-              ))}
+                upcomingRecords && upcomingRecords.data && upcomingRecords.data.length > 0 ? (
+                  <View
+                    style={{
+                      backgroundColor: "#222",
+                      borderRadius: 10,
+                      padding: 16,
+                      width: width * 0.8,
+                      marginBottom: 10,
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16, marginBottom: 4 }}>
+                      {upcomingRecords.data[0].schedule?.name || "Upcoming Schedule"}
+                    </Text>
+                    <Text style={{ color: "#bbb", fontSize: 14 }}>
+                      Date: {upcomingRecords.data[0].schedule?.created_at?.slice(0, 10)}
+                    </Text>
+                    <Text style={{ color: "#bbb", fontSize: 14 }}>
+                      Start: {new Date(upcomingRecords.data[0].schedule?.start_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    </Text>
+                    <Text style={{ color: "#bbb", fontSize: 14 }}>
+                      End: {new Date(upcomingRecords.data[0].schedule?.end_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    </Text>
+                    <Text style={{ color: "#bbb", fontSize: 14, marginTop: 4 }}>
+                      Status: {upcomingRecords.data[0].status}
+                    </Text>
+                    {(upcomingRecords.data[0].status?.includes("late-excused") && upcomingRecords.data[0].adjusted_time) && (
+                      <Text style={{ color: "#ffb300", fontSize: 14 }}>
+                        Adjusted Start: {new Date(upcomingRecords.data[0].adjusted_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      </Text>
+                    )}
+                    {(upcomingRecords.data[0].status?.includes("early-excused") && upcomingRecords.data[0].adjusted_time) && (
+                      <Text style={{ color: "#ffb300", fontSize: 14 }}>
+                        Adjusted End: {new Date(upcomingRecords.data[0].adjusted_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      </Text>
+                    )}
+                  </View>
+                ) : (
+                  <View style={{ alignItems: "center" }}>
+                    <MaterialCommunityIcons name="calendar-clock" size={90} color="gray" />
+                    <Text style={{ color: "#bbb", fontSize: 14 }}>No upcoming schedule</Text>
+                  </View>
+                ))}
+            </View>
+            <Text style={styles.username}>{first_name}</Text>
+            <Text style={styles.date}>{currentDate}</Text>
+            <Text style={styles.time}>{currentTime}</Text>
           </View>
-          <Text style={styles.username}>{first_name}</Text>
-          <Text style={styles.date}>{currentDate}</Text>
-          <Text style={styles.time}>{currentTime}</Text>
+          <View style={styles.buttonContainer}>
+            <View style={styles.buttonWrapper}>
+              <TouchableOpacity
+                style={[
+                  styles.checkInButton,
+                  isCheckInDisabled && styles.disabledButton,
+                ]}
+                onPress={() => checkInOrOut("check-in")}
+                disabled={isCheckInDisabled}
+              >
+                <MaterialCommunityIcons
+                  name="map-marker-check"
+                  size={30}
+                  color="white"
+                />
+              </TouchableOpacity>
+              <Text style={styles.buttonText}>Check In</Text>
+            </View>
+            <View style={styles.buttonWrapper}>
+              <TouchableOpacity
+                style={[
+                  styles.checkOutButton,
+                  isCheckOutDisabled && styles.disabledButton,
+                ]}
+                onPress={() => checkInOrOut("check-out")}
+                disabled={isCheckOutDisabled}
+              >
+                <MaterialIcons name="location-off" size={30} color="white" />
+              </TouchableOpacity>
+              <Text style={styles.buttonText}>Check Out</Text>
+            </View>
+          </View>
         </View>
-        <View style={styles.buttonContainer}>
-          <View style={styles.buttonWrapper}>
-            <TouchableOpacity
-              style={[
-                styles.checkInButton,
-                isCheckInDisabled && styles.disabledButton,
-              ]}
-              onPress={() => checkInOrOut("check-in")}
-              disabled={isCheckInDisabled}
-            >
-              <MaterialCommunityIcons
-                name="map-marker-check"
-                size={30}
-                color="white"
-              />
-            </TouchableOpacity>
-            <Text style={styles.buttonText}>Check In</Text>
-          </View>
-          <View style={styles.buttonWrapper}>
-            <TouchableOpacity
-              style={[
-                styles.checkOutButton,
-                isCheckOutDisabled && styles.disabledButton,
-              ]}
-              onPress={() => checkInOrOut("check-out")}
-              disabled={isCheckOutDisabled}
-            >
-              <MaterialIcons name="location-off" size={30} color="white" />
-            </TouchableOpacity>
-            <Text style={styles.buttonText}>Check Out</Text>
-          </View>
-        </View>
-      </View>
+      </ScrollView>
       <Toast />
     </ImageBackground>
   );
