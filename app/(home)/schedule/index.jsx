@@ -1,11 +1,13 @@
 import React, { useMemo, useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
-import { ExpandableCalendar, Timeline, CalendarProvider } from "react-native-calendars";
+import { ExpandableCalendar, TimelineList, CalendarProvider, timelineProps, CalendarUtils } from "react-native-calendars";
 import axiosBackendInstance from "../../../api/axios";
 import { useNavigation } from "@react-navigation/native";
 import { TouchableOpacity } from "react-native";
 import { useAuthStore } from '@/store/index';
 import { useQuery } from "@tanstack/react-query";
+import groupBy from 'lodash/groupBy';
+import { useWindowDimensions } from "react-native";
 
 
 function useLectureSessions(enabled) {
@@ -116,6 +118,8 @@ export default function ScheduleScreen() {
   const { data: lecturesRaw = [], isLoading: loadingLectures } = useLectureSessions(showLectures);
   const { data: eventsRaw = [], isLoading: loadingEvents } = useEventSessions(showEvents);
 
+  const { height } = useWindowDimensions();
+
   const [selectedDate, setSelectedDate] = useState(() => {
     // Default to today in YYYY-MM-DD
     const d = new Date();
@@ -191,53 +195,45 @@ export default function ScheduleScreen() {
     }));
   }, [allEvents, selectedDate]);
 
+  // Prepare events for TimelineList: group by date string
+  const eventsByDate = useMemo(() => {
+    return groupBy(
+      allEvents.map(ev => ({
+        ...ev,
+        start: new Date(ev.start),
+        end: new Date(ev.end),
+        title: ev.title,
+        summary: ev.description,
+      })),
+      e => CalendarUtils.getCalendarDateString(e.start)
+    );
+  }, [allEvents]);
+
+  // Timeline props
+  const timelinePropsObj = {
+    start: 7,
+    end: 22,
+    format24h: false,
+    showNowIndicator: true,
+    scrollToFirst: true,
+    overlapEventsSpacing: 8,
+    rightEdgeSpacing: 24
+  };
+
   return (
     <View style={styles.container}>
-      <CalendarProvider date={selectedDate}>
+      <CalendarProvider date={selectedDate} onDateChanged={setSelectedDate} showTodayButton>
         <ExpandableCalendar
           onDayPress={day => setSelectedDate(day.dateString)}
           markedDates={{ [selectedDate]: { selected: true } }}
-          initialPosition="open"
+          initialPosition="closed"
         />
-        <ScrollView >
-          {/* DEBUG: Show raw events for the selected date */}
-          {eventsForSelectedDate.length === 0 ? (
-            <View style={styles.emptyDate}>
-              <Text>No events</Text>
-            </View>
-          ) : null}
-          {/* DEBUG: Show event titles for verification */}
-          {eventsForSelectedDate.length > 0 && (
-            <View style={{ padding: 10 }}>
-              <Text style={{ fontWeight: 'bold' }}>Events for {selectedDate}:</Text>
-              {eventsForSelectedDate.map(ev => (
-                <Text key={ev.id}>{ev.title} ({ev.start.toLocaleTimeString()} - {ev.end.toLocaleTimeString()})</Text>
-              ))}
-            </View>
-          )}
-          <Timeline
-            events={eventsForSelectedDate}
-            showNowIndicator
-            style={{ minHeight: 400 }}
-            renderEvent={event => (
-              <TouchableOpacity
-                style={styles.item}
-              >
-                <Text style={{ fontWeight: "bold" }}>{event.title}</Text>
-                {event.type === "lecture" && event.instructor ? (
-                  <Text>Instructor: {event.instructor}</Text>
-                ) : null}
-                {event.speaker ? <Text>Speaker: {event.speaker}</Text> : null}
-                <Text>
-                  {event.start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                  {" - "}
-                  {event.end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                </Text>
-                {event.summary ? <Text>{event.summary}</Text> : null}
-              </TouchableOpacity>
-            )}
+        <View style={{ flex: 1 }}>
+          <TimelineList
+            events={eventsByDate}
+            timelineProps={timelinePropsObj}
           />
-        </ScrollView>
+        </View>
       </CalendarProvider>
     </View>
   );

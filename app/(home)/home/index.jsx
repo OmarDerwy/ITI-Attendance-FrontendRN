@@ -207,6 +207,7 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     flexDirection: "column",
+
   },
   welcome: {
     fontSize: 20,
@@ -238,8 +239,6 @@ const styles = StyleSheet.create({
   actionLabel: {
     marginLeft: 10,
     fontSize: 16,
-    color: "#ac0808",
-    fontWeight: "bold",
   },
 });
 
