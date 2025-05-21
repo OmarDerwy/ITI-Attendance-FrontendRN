@@ -2,7 +2,7 @@
   "expo": {
     "name": "TrackIt",
     "slug": "trackit",
-    "version": "0.0.1",
+    "version": "0.1.4",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -10,14 +10,14 @@
     "jsEngine": "hermes",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.frontendRN"
+      "bundleIdentifier": "com.iti.trackit"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.frontendRN",
+      "package": "com.iti.trackit",
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
@@ -63,7 +63,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "11362747-47f8-4fdd-8035-c3e2ed956655"
+        "projectId": "61c399df-3576-4ad7-8b8c-237828ea1ece"
       }
     }
   }
