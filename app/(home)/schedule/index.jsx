@@ -4,6 +4,8 @@ import { Calendar as BigCalendar } from "react-native-big-calendar";
 import axiosBackendInstance from "../../../api/axios";
 import { useNavigation } from "@react-navigation/native";
 import { useAuthStore } from '@/store/index';
+import { useWindowDimensions } from "react-native";
+
 
 function lecturesToCalendarEvents(lectures) {
   return lectures.map((l) => ({
@@ -63,6 +65,8 @@ function GeneralScheduleScreen() {
   const [eventsRaw, setEventsRaw] = useState([]);
   const [loadingLectures, setLoadingLectures] = useState(false);
   const [loadingEvents, setLoadingEvents] = useState(false);
+
+ const { width, height } = useWindowDimensions();
 
   useEffect(() => {
     let ignore = false;
@@ -138,10 +142,10 @@ function GeneralScheduleScreen() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, padding: 10 }}>
       <BigCalendar
         events={events}
-        height={600}
+        height={height - 100}
         mode="3days"
         eventCellStyle={(event) => ({ backgroundColor: event.color })}
         onPressEvent={(event) => {
