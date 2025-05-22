@@ -24,8 +24,6 @@ export default function ClockInOutScreen() {
   const { first_name } = useAuthStore((state) => state.first_name);
   const { id } = useAuthStore((state) => state.id);
 
-  
-
   const fetchDeviceUUID = async () => {
     let storedUUID = await SecureStore.getItemAsync("deviceUUID");
     if (!storedUUID) {
@@ -93,18 +91,34 @@ export default function ClockInOutScreen() {
         Toast.show({ type: "error", text1: "Location permission denied" });
         return null;
       }
-      return await Location.getCurrentPositionAsync({ timeout: 5000 });
+
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Highest,
+        maximumAge: 0,
+        timeout: 5000,
+      });
+
+      const mockCheck = await Location.hasServicesEnabledAsync();
+
+      if (!mockCheck || location.mocked) {
+        Toast.show({
+          type: "error",
+          text1: "Fake GPS detected",
+          position: "bottom",
+        });
+        return null;
+      }
+
+      return location;
     } catch (error) {
-      Toast.show({ type: "error", text1: "Error fetching location" });
+      Toast.show({ type: "error", text1: "Error fetching location", position: "bottom" });
       return null;
     }
   };
 
   const checkInOrOut = async (type) => {
     if (!deviceUUID) {
-      console.log("deviceUUID",deviceUUID);
-      
-      Toast.show({ type: "error", text1: "UUID is not available" });
+      Toast.show({ type: "error", text1: "UUID is not available", position: "bottom" });
       return;
     }
     setCheckInOutButtonPending(type);
@@ -113,22 +127,7 @@ export default function ClockInOutScreen() {
     if (!location) return;
 
     const { latitude, longitude } = location.coords;
-    // const latitude = 30.071112	;
-    // const longitude = 31.018496 ;
-  
-    
-    // console.log("Sending:", {
-    //   user_id: 1,
-    //   uuid: deviceUUID,
-    //   latitude,
-    //   longitude,
-    // });
-    console.log("Sending:", {
-      user_id: id,
-      uuid: deviceUUID,
-      latitude,
-      longitude,
-    });
+
     try {
       const response = await axiosBackendInstance.post(
         `attendance/${type}/`,
@@ -139,8 +138,6 @@ export default function ClockInOutScreen() {
           longitude,
         }
       );
-
-      console.log("checkin Response:", response.data);
 
       if (response.data.status === "success") {
         Toast.show({
@@ -167,7 +164,6 @@ export default function ClockInOutScreen() {
       }
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message;
-      console.error("Error during check-in/out:", errorMessage);
       Toast.show({
         type: "error",
         text1: "API error",
@@ -178,6 +174,8 @@ export default function ClockInOutScreen() {
       setCheckInOutButtonPending("");
     }
   };
+
+
 
   // code to fetch the next upcoming day to be used in the check in and check out using tanstack
   const { data: upcomingRecords, isLoading: isLoadingRecords, error, refetch } = useQuery({
