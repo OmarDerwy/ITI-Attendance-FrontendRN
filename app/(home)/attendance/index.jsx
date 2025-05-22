@@ -37,14 +37,14 @@ export default function ClockInOutScreen() {
 
   const fetchUserStatus = async () => {
     try {
-      const response = await axiosBackendInstance.get(`attendance/status/`);
-
-      if (response.data.is_checked_in) {
-        setIsCheckInDisabled(true); 
-        setIsCheckOutDisabled(false); 
+      const response = await axiosBackendInstance.get(`attendance/todays-schedule/`);
+      //if response.data is null then there is no schedule today and both buttons are disabled. If response.data.check_in_time is null then the user has not checked in yet and the check in button is enabled. If response.data.check_out_time is null then the user has checked in but not checked out yet and the check out button is enabled.
+      if (!response.data) {
+        setIsCheckInDisabled(true);
+        setIsCheckOutDisabled(true);
       } else {
-        setIsCheckInDisabled(false); 
-        setIsCheckOutDisabled(true); 
+        setIsCheckInDisabled(response.data.check_in_time !== null);
+        setIsCheckOutDisabled(response.data.check_out_time !== null);
       }
     } catch (error) {
       console.error("Error fetching user status:", error);
