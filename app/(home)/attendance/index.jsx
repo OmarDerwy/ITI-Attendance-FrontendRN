@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ImageBackground, ScrollView, RefreshControl } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ImageBackground, ScrollView, RefreshControl, ActivityIndicator } from "react-native";
 import { getRandomBytes } from 'expo-crypto';
 import * as SecureStore from 'expo-secure-store';
 import * as Location from 'expo-location';
@@ -18,7 +18,8 @@ export default function ClockInOutScreen() {
   const [currentTime, setCurrentTime] = useState("");
   const [deviceUUID, setDeviceUUID] = useState(null);
   const [isCheckInDisabled, setIsCheckInDisabled] = useState(false); 
-  const [isCheckOutDisabled, setIsCheckOutDisabled] = useState(false); 
+  const [isCheckOutDisabled, setIsCheckOutDisabled] = useState(false);
+  const [checkInOutButtonPending, setCheckInOutButtonPending] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const { first_name } = useAuthStore((state) => state.first_name);
   const { id } = useAuthStore((state) => state.id);
@@ -34,20 +35,29 @@ export default function ClockInOutScreen() {
 
   const fetchUserStatus = async () => {
     try {
-      const response = await axiosBackendInstance.get(`attendance/status/`);
-
-      if (response.data.is_checked_in) {
-        setIsCheckInDisabled(true); 
-        setIsCheckOutDisabled(false); 
+      const response = await axiosBackendInstance.get(`attendance/todays-schedule/`);
+      //if response.data is null then there is no schedule today and both buttons are disabled. If response.data.check_in_time is null then the user has not checked in yet and the check in button is enabled. If response.data.check_out_time is null then the user has checked in but not checked out yet and the check out button is enabled.
+      console.log("todays schedule response", response.data);
+      if (response.data.data === null) {
+        setIsCheckInDisabled(true);
+        setIsCheckOutDisabled(true);
+      } else if (response.data.data.check_in_time === null) {
+        setIsCheckInDisabled(false);
+        setIsCheckOutDisabled(true);
+      } else if (response.data.data.check_out_time === null) {
+        setIsCheckInDisabled(true);
+        setIsCheckOutDisabled(false);
       } else {
-        setIsCheckInDisabled(false); 
-        setIsCheckOutDisabled(true); 
+        setIsCheckInDisabled(true);
+        setIsCheckOutDisabled(true);
       }
     } catch (error) {
-      console.error("Error fetching user status:", error);
+      setIsCheckInDisabled(true);
+      setIsCheckOutDisabled(true);
+      console.error("Error fetching today's schedule:", error);
       Toast.show({
         type: "error",
-        text1: "Error fetching user status",
+        text1: "Error fetching today's schedule",
         text2: error.message,
       });
     }
@@ -111,6 +121,7 @@ export default function ClockInOutScreen() {
       Toast.show({ type: "error", text1: "UUID is not available", position: "bottom" });
       return;
     }
+    console.log(id);
     const location = await getLocation();
     if (!location) return;
 
@@ -158,6 +169,8 @@ export default function ClockInOutScreen() {
         text2: errorMessage,
         position: "bottom",
       });
+    } finally {
+      setCheckInOutButtonPending("");
     }
   };
 
@@ -278,13 +291,13 @@ export default function ClockInOutScreen() {
                   isCheckInDisabled && styles.disabledButton,
                 ]}
                 onPress={() => checkInOrOut("check-in")}
-                disabled={isCheckInDisabled}
+                disabled={isCheckInDisabled || checkInOutButtonPending === "check-in"}
               >
-                <MaterialCommunityIcons
+                { checkInOutButtonPending === "check-in" ? <ActivityIndicator color="white" /> : <MaterialCommunityIcons
                   name="map-marker-check"
                   size={30}
                   color="white"
-                />
+                />}
               </TouchableOpacity>
               <Text style={styles.buttonText}>Check In</Text>
             </View>
@@ -295,9 +308,9 @@ export default function ClockInOutScreen() {
                   isCheckOutDisabled && styles.disabledButton,
                 ]}
                 onPress={() => checkInOrOut("check-out")}
-                disabled={isCheckOutDisabled}
+                disabled={isCheckOutDisabled || checkInOutButtonPending === "check-out"}
               >
-                <MaterialIcons name="location-off" size={30} color="white" />
+                { checkInOutButtonPending === "check-out" ? <ActivityIndicator color="white" /> : <MaterialIcons name="location-off" size={30} color="white" />}
               </TouchableOpacity>
               <Text style={styles.buttonText}>Check Out</Text>
             </View>
@@ -361,6 +374,8 @@ const styles = StyleSheet.create({
   checkInButton: {
     backgroundColor: "green",
     padding: 15,
+    width: 60,
+    height: 60,
     borderRadius: 30,
     alignItems: "center",
     justifyContent: "center",
