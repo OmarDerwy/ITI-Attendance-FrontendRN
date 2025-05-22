@@ -1,58 +1,72 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import CustomButton from '../../components/CustomButton';
 import { COLORS, FONT_SIZES } from '../../constants/theme';
 import { RefreshControl } from 'react-native-gesture-handler';
+import axiosBackendInstance from '@/api/axios';
 
 export default function GuestEventsScreen() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(null);
+  const [registeringId, setRegisteringId] = useState(null);
   const router = useRouter();
 
-  useEffect(() => {
-    // Mock data for development/demo
-    const mockEvents = [
-      {
-        id: 1,
-        name: 'Welcome Mixer',
-        description: 'Meet other guests and enjoy refreshments.',
-        date: '2025-06-01T18:00:00Z',
-      },
-      {
-        id: 2,
-        name: 'Tech Talk: The Future of AI',
-        description: 'A talk on AI trends and applications.',
-        date: '2025-06-05T14:00:00Z',
-      },
-      {
-        id: 3,
-        name: 'Community Picnic',
-        description: 'Join us for food, games, and fun in the park.',
-        date: '2025-06-10T12:00:00Z',
-      },
-    ];
-    setEvents(mockEvents);
-    setLoading(false);
+  const fetchEvents = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axiosBackendInstance.get('attendance/events/events-for-registration/');
+      setEvents(response.data);
+    } catch (err) {
+      setError('Failed to load events');
+      setEvents([]);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   }, []);
 
-  const handleRegister = (event) => {
-    // You can navigate to a registration page or call an API here
-    Alert.alert('Registered', `You have registered for ${event.name}`);
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
+
+  const handleRegister = async (event) => {
+    setRegisteringId(event.id);
+    try {
+      await axiosBackendInstance.post(`attendance/events/${event.id}/register/`);
+      Alert.alert('Registered', `You have registered for ${event.title}`);
+      await fetchEvents();
+    } catch (err) {
+      Alert.alert('Error', 'Failed to register for this event.');
+    } finally {
+      setRegisteringId(null);
+    }
   };
 
   const renderItem = ({ item }) => (
     <View style={styles.eventCard}>
-      <Text style={styles.eventName}>{item.name}</Text>
-      <Text style={styles.eventDate}>{item.date ? new Date(item.date).toLocaleString() : 'No date'}</Text>
+      <Text style={styles.eventName}>{item.title}</Text>
+      <Text style={styles.eventDate}>{item.event_date ? new Date(item.event_date).toLocaleString() : 'No date'}</Text>
       <Text style={styles.eventDescription}>{item.description}</Text>
-      <CustomButton
-        text="Register"
-        color={COLORS.red}
-        fontSize={FONT_SIZES.medium}
-        buttonHandler={() => handleRegister(item)}
-      />
+      <TouchableOpacity
+        style={{ opacity: registeringId === item.id ? 0.7 : 1 }}
+        onPress={() => handleRegister(item)}
+        disabled={registeringId === item.id}
+      >
+        {registeringId === item.id ? (
+          <ActivityIndicator color={COLORS.red} />
+        ) : (
+          <CustomButton
+            text="Register"
+            color={COLORS.red}
+            fontSize={FONT_SIZES.medium}
+            buttonHandler={() => handleRegister(item)}
+          />
+        )}
+      </TouchableOpacity>
     </View>
   );
 
@@ -60,6 +74,15 @@ export default function GuestEventsScreen() {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color={COLORS.red} />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <Text style={{ color: COLORS.red }}>{error}</Text>
+        <CustomButton text="Retry" color={COLORS.red} buttonHandler={fetchEvents} />
       </View>
     );
   }
@@ -78,10 +101,7 @@ export default function GuestEventsScreen() {
             refreshing={refreshing}
             onRefresh={() => {
               setRefreshing(true);
-              // Simulate a network request
-              setTimeout(() => {
-                setRefreshing(false);
-              }, 2000);
+              fetchEvents();
             }}
             colors={[COLORS.red]}
           />
