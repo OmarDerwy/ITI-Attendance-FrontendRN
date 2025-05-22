@@ -121,6 +121,7 @@ export default function ClockInOutScreen() {
       Toast.show({ type: "error", text1: "UUID is not available", position: "bottom" });
       return;
     }
+    setCheckInOutButtonPending(type);
     console.log(id);
     const location = await getLocation();
     if (!location) return;
