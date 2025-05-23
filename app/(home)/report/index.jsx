@@ -129,6 +129,10 @@ export default function ReportScreen() {
       Alert.alert("Error", "Please fill in all required fields.");
       return;
     }
+    if (description.length < 30) {
+      Alert.alert("Error", "Description must be at least 30 characters long.");
+      return;
+    }
     if (status === "FOUND" && !image) {
       Alert.alert("Error", "Please upload an image for found items.");
       return;
