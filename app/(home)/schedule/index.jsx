@@ -24,38 +24,11 @@ function useLectureSessions(enabled) {
 }
 
 function useEventSessions(enabled) {
-  // Mock data for now
   return useQuery({
     queryKey: ["event-sessions"],
     queryFn: async () => {
-      // Simulate API delay
-      await new Promise((res) => setTimeout(res, 200));
-      return [
-        {
-          title: "Python Workshop",
-          description: "Learn Python basics",
-          event_date: "2025-05-20",
-          audience_type: "both",
-          is_mandatory: true,
-          target_track_ids: [1],
-          sessions: [
-            {
-              title: "Introduction to Python",
-              speaker: "John Doe",
-              start_time: "2025-05-20T09:00:00Z",
-              end_time: "2025-05-20T10:30:00Z",
-              description: "Basic Python syntax and concepts",
-            },
-            {
-              title: "Advanced Python Features",
-              speaker: "Jane Smith",
-              start_time: "2025-05-20T11:00:00Z",
-              end_time: "2025-05-20T12:30:00Z",
-              description: "Decorators, generators, and context managers",
-            },
-          ],
-        },
-      ];
+      const { data } = await axiosBackendInstance.get("attendance/events/");
+      return data;
     },
     enabled,
   });
