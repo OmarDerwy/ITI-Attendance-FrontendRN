@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { View, Text, Image, Dimensions } from "react-native";
 import { useRouter } from "expo-router";
+import { en, registerTranslation } from "react-native-paper-dates";
 
 const { width, height } = Dimensions.get("window");
 
@@ -10,6 +11,8 @@ export default function WelcomeScreen() {
   useEffect(() => {
     const waitForSplash = async () => {
       await new Promise((resolve) => setTimeout(resolve, 2000)); //for some delay for the splash screen
+      
+      registerTranslation("en", en);
 
       if (true) {
         router.replace('(home)');

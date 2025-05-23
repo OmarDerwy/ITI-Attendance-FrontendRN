@@ -1,6 +1,6 @@
 import { Text, TextInput, View, Image, StyleSheet, Dimensions, Modal, Alert } from 'react-native'
 import React from 'react'
-import { useLoadingStore, useAuthStore } from '../../store'
+import { useLoadingStore } from '../../store'
 import CustomButton from '../components/CustomButton'
 import { COLORS, FONT_SIZES } from '../constants/theme'
 import { useRouter } from 'expo-router'
@@ -10,21 +10,15 @@ const { width } = Dimensions.get('window')
 export default function SignUpScreen() {
   const { isLoaded, setLoading } = useLoadingStore((state) => state)
   const router = useRouter()
-  const userContext = useAuthStore((state) => state)
 
   const [emailAddress, setEmailAddress] = React.useState('')
-  const [password, setPassword] = React.useState('')
-  const [confirmPassword, setConfirmPassword] = React.useState('')
   const [firstName, setFirstName] = React.useState('')
   const [lastName, setLastName] = React.useState('')
+  const [phoneNumber, setPhoneNumber] = React.useState('')
 
   const onSignUpPress = () => {
-    if (!emailAddress || !password || !confirmPassword || !firstName || !lastName) {
+    if (!emailAddress || !firstName || !lastName || !phoneNumber) {
       Alert.alert('Missing fields', 'Please fill in all fields.')
-      return
-    }
-    if (password !== confirmPassword) {
-      Alert.alert('Password mismatch', 'Passwords do not match.')
       return
     }
     // Pass collected data to sign-up-details screen
@@ -32,9 +26,9 @@ export default function SignUpScreen() {
       pathname: '/sign-up-details',
       params: {
         email: emailAddress,
-        password,
         first_name: firstName,
         last_name: lastName,
+        phone: phoneNumber,
       },
     })
   }
@@ -71,17 +65,9 @@ export default function SignUpScreen() {
           />
           <TextInput
             style={styles.input}
-            value={password}
-            placeholder="Enter password"
-            secureTextEntry={true}
-            onChangeText={setPassword}
-          />
-          <TextInput
-            style={styles.input}
-            value={confirmPassword}
-            placeholder="Confirm password"
-            secureTextEntry={true}
-            onChangeText={setConfirmPassword}
+            value={phoneNumber}
+            placeholder="Phone number"
+            onChangeText={setPhoneNumber}
           />
           <View style={styles.button}>
             <CustomButton text="Continue" color={COLORS.red} fontSize={FONT_SIZES.medium} buttonHandler={onSignUpPress} />
