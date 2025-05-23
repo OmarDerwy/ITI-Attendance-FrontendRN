@@ -18,6 +18,7 @@ import axios from "axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosBackendInstance from '../../../api/axios'
 import CustomButton from "../../components/CustomButton";
+import { COLORS } from "../../constants/theme";
 
 const { width } = Dimensions.get("window");
 
@@ -136,86 +137,86 @@ export default function ReportScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Report Lost/Found Item</Text>
-
-      <TextInput
-        style={styles.input}
-        placeholder="Item Name"
-        value={name}
-        onChangeText={setName}
-      />
-
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        placeholder="Description"
-        value={description}
-        onChangeText={setDescription}
-        multiline
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Place"
-        value={place}
-        onChangeText={setPlace}
-      />
-
-      {/* Custom Dropdown */}
-      <TouchableOpacity
-        style={styles.dropdownButton}
-        onPress={() => setDropdownVisible(true)}
-      >
-        <Text style={styles.dropdownButtonText}>{status}</Text>
-      </TouchableOpacity>
-      <Modal
-        visible={dropdownVisible}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setDropdownVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <FlatList
-              data={statusOptions}
-              keyExtractor={(item) => item}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.modalItem}
-                  onPress={() => {
-                    setStatus(item);
-                    setDropdownVisible(false);
-                  }}
-                >
-                  <Text style={styles.modalItemText}>{item}</Text>
-                </TouchableOpacity>
-              )}
-            />
-          </View>
-        </View>
-      </Modal>
-
-      <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
-        <Text style={styles.imagePickerText}>Pick an Image</Text>
-      </TouchableOpacity>
-
-      {status === "FOUND" && (
-        <TouchableOpacity style={styles.imagePicker} onPress={takeImage}>
-          <Text style={styles.imagePickerText}>Take an Image</Text>
+    <View>
+      <View style={styles.header}>
+        <Text style={styles.title}>Report Lost/Found Item</Text>
+      </View>
+      <ScrollView contentContainerStyle={styles.container}>
+        <TextInput style={styles.label}>Item Name</TextInput>
+        <TextInput
+          style={styles.input}
+          placeholder="(ex: mobile phone)"
+          value={name}
+          onChangeText={setName}
+        />
+        <TextInput style={styles.label}>Item Description</TextInput>
+        <TextInput
+          style={[styles.input, styles.textArea]}
+          placeholder="(ex: Black Samsung Galaxy S22 Ultra 256 Gigabyte)"
+          value={description}
+          onChangeText={setDescription}
+          multiline
+        />
+        <TextInput style={styles.label}>Item Place</TextInput>
+        <TextInput
+          style={styles.input}
+          placeholder="Where was the item lost/found? (e.g. Library, 2nd floor)"
+          value={place}
+          onChangeText={setPlace}
+        />
+        <TextInput style={styles.label}>Report Type</TextInput>
+        {/* Custom Dropdown */}
+        <TouchableOpacity
+          style={styles.dropdownButton}
+          onPress={() => setDropdownVisible(true)}
+        >
+          <Text style={styles.dropdownButtonText}>{status}</Text>
         </TouchableOpacity>
-      )}
-
-      {image && (
-        <View style={styles.imageContainer}>
-          <Image source={{ uri: image }} style={styles.imagePreview} />
-          <TouchableOpacity style={styles.removeIcon} onPress={handleRemoveImage}>
-            <MaterialIcons name="close" size={24} color="white" />
+        <Modal
+          visible={dropdownVisible}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setDropdownVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <FlatList
+                data={statusOptions}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.modalItem}
+                    onPress={() => {
+                      setStatus(item);
+                      setDropdownVisible(false);
+                    }}
+                  >
+                    <Text style={styles.modalItemText}>{item}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
+          </View>
+        </Modal>
+        <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
+          <Text style={styles.imagePickerText}>Pick an Image</Text>
+        </TouchableOpacity>
+        {status === "FOUND" && (
+          <TouchableOpacity style={styles.imagePicker} onPress={takeImage}>
+            <Text style={styles.imagePickerText}>Take an Image</Text>
           </TouchableOpacity>
-        </View>
-      )}
-
-      <CustomButton text="Submit Report" buttonHandler={handleSubmit} disabled={reportMutation.isPending} />
-    </ScrollView>
+        )}
+        {image && (
+          <View style={styles.imageContainer}>
+            <Image source={{ uri: image }} style={styles.imagePreview} />
+            <TouchableOpacity style={styles.removeIcon} onPress={handleRemoveImage}>
+              <MaterialIcons name="close" size={24} color="white" />
+            </TouchableOpacity>
+          </View>
+        )}
+        <CustomButton text="Submit Report" buttonHandler={handleSubmit} disabled={reportMutation.isPending} />
+      </ScrollView>
+    </View>
   );
 }
 
@@ -223,25 +224,35 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: "white",
+    backgroundColor: "#fAfAfA",
+  },
+  header: {
+    paddingTop: 20,
+    backgroundColor: "#ac0808",
+    alignItems: "center",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
+    color: "white",
   },
   input: {
     borderWidth: 1,
     borderColor: "gray",
     borderRadius: 10,
     padding: 10,
-    marginBottom: 15,
     fontSize: 16,
+    backgroundColor: "white",
   },
   textArea: {
     height: 100,
     textAlignVertical: "top",
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "bold",
   },
   dropdownButton: {
     borderWidth: 1,
@@ -249,7 +260,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     marginBottom: 15,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "white",
   },
   dropdownButtonText: {
     fontSize: 16,
@@ -288,15 +299,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   imagePicker: {
-    backgroundColor: "#ac0808",
+    backgroundColor: COLORS.red,
     padding: 10,
-    borderRadius: 10,
+    borderRadius: 15,
     alignItems: "center",
     marginBottom: 15,
   },
   imagePickerText: {
     color: "white",
-    fontWeight: "bold",
   },
   imageContainer: {
     position: "relative",

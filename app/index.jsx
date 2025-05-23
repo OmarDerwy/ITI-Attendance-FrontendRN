@@ -49,7 +49,7 @@ export default function WelcomeScreen() {
           textAlign: "center",
         }}
       >
-        TrackIt
+        InTrack AI
       </Text>
     </View>
   );

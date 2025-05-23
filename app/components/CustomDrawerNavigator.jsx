@@ -56,7 +56,7 @@ export default function CustomDrawerNavigator({ screens }) {
                   justifyContent: "center",
                   position: "absolute",
                   left: "50%",
-                  transform: [{ translateX: -80 }],
+                  transform: [{ translateX: -90 }],
                 }}
               >
                 <Image
@@ -72,7 +72,7 @@ export default function CustomDrawerNavigator({ screens }) {
                     alignSelf: "flex-end",
                   }}
                 >
-                  TrackIt
+                  InTrack AI
                 </Text>
               </View>
             ),

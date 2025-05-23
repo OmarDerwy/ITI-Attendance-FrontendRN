@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   pickerContainer: {
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 5,
+    borderRadius: 10,
     backgroundColor: "white",
   },
   picker: {
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 5,
+    borderRadius: 10,
     padding: 10,
     backgroundColor: "white",
     textAlignVertical: "top",
@@ -280,14 +280,14 @@ const styles = StyleSheet.create({
     padding: 15,
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 5,
+    borderRadius: 10,
     backgroundColor: "white",
     alignItems: "center",
   },
   submitButton: {
     backgroundColor: "#ac0808",
     padding: 15,
-    borderRadius: 5,
+    borderRadius: 10,
     alignItems: "center",
     marginTop: 30,
   },
