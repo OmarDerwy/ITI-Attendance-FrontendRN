@@ -9,11 +9,11 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import useWebSocketNotifications from "../hooks/useWebSocketNotifications";
+import { useNotifications } from '../hooks/useWebSocketNotifications';
 
 export default function NotificationsScreen() {
   const router = useRouter();
-  const { notifications, markAsRead, deleteNotification } = useWebSocketNotifications();
+  const { notifications, markAsRead, deleteNotification } = useNotifications();
   const [displayedNotifications, setDisplayedNotifications] = useState([]);
   const [selectedNotification, setSelectedNotification] = useState(null); 
   const [visibleCount, setVisibleCount] = useState(10); // Number of notifications currently visible

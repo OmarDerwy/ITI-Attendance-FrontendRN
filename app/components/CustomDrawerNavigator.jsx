@@ -10,14 +10,14 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import useWebSocketNotifications from "../../hooks/useWebSocketNotifications";
+import { useNotifications } from '../../hooks/useWebSocketNotifications';
 
 const Drawer = createDrawerNavigator();
 const { width } = Dimensions.get("window");
 
 export default function CustomDrawerNavigator({ screens }) {
   const router = useRouter();
-  const { unreadCount } = useWebSocketNotifications(); 
+  const { unreadCount } = useNotifications(); 
 
   return (
     <Drawer.Navigator

@@ -1,3 +1,4 @@
+import React, { createContext, useContext, ReactNode } from 'react';
 import { useEffect, useState, useRef } from "react";
 import { AppState, AppStateStatus, Platform } from "react-native";
 import * as storage from "expo-secure-store";
@@ -5,6 +6,9 @@ import { getUserNotifications, markNotificationAsRead, deleteNotification as del
 // import * as Notifications from "expo-notifications";
 // import * as Device from "expo-device";
 // import Constants from "expo-constants";
+import Toast from 'react-native-toast-message';
+import { Audio } from 'expo-av'; // Import Audio from expo-av
+
 
 type Notification = {
   id: number;
@@ -65,13 +69,23 @@ export default function useWebSocketNotifications() {
         const data = JSON.parse(e.data);
         const newNotification: Notification = {
           id: Date.now(),
-          message: data.message || "New notification",
+          message: data.body || "New notification",
           created_at: new Date().toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
           }),
           is_read: false,
         };
+        console.log("Before JSON.parse", e.data);
+        console.log("New notification received:", data);
+        //play sound and raise toast
+        Toast.show({
+          type: 'success',
+          text1: data.title || "New notification",
+          text2: data.body || "",
+          position: 'top',
+          visibilityTime: 4000,
+        });
 
         setNotifications((prev) => [newNotification, ...prev]);
         setUnreadCount((prev) => prev + 1);
@@ -119,4 +133,22 @@ export default function useWebSocketNotifications() {
     markAsRead,
     deleteNotification,
   };
+}
+
+type NotificationsContextType = ReturnType<typeof useWebSocketNotifications>;
+const NotificationsContext = createContext<NotificationsContextType | null>(null);
+
+export function NotificationsProvider({ children }: { children: ReactNode }) {
+  const notificationsValue = useWebSocketNotifications();
+  return (
+    <NotificationsContext.Provider value={notificationsValue}>
+      {children}
+    </NotificationsContext.Provider>
+  );
+}
+
+export function useNotifications() {
+  const context = useContext(NotificationsContext);
+  if (!context) throw new Error('useNotifications must be used within a NotificationsProvider');
+  return context;
 }

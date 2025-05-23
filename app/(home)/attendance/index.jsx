@@ -347,7 +347,6 @@ export default function ClockInOutScreen() {
           </View>
         </View>
       </ScrollView>
-      <Toast />
     </ImageBackground>
   );
 }
