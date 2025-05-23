@@ -21,8 +21,10 @@ export default function ClockInOutScreen() {
   const [isCheckOutDisabled, setIsCheckOutDisabled] = useState(false);
   const [checkInOutButtonPending, setCheckInOutButtonPending] = useState("");
   const [refreshing, setRefreshing] = useState(false);
+  const [isEventSchedule, setIsEventSchedule] = useState(false);
   const { first_name } = useAuthStore((state) => state.first_name);
   const { id } = useAuthStore((state) => state.id);
+  const { role } = useAuthStore((state) => state.role);
 
   const fetchDeviceUUID = async () => {
     let storedUUID = await SecureStore.getItemAsync("deviceUUID");
@@ -35,16 +37,24 @@ export default function ClockInOutScreen() {
 
   const fetchUserStatus = async () => {
     try {
-      const response = await axiosBackendInstance.get(`attendance/todays-schedule/`);
+      let response = null;
+      if (role !== "guest") {
+        response = await axiosBackendInstance.get(`attendance/todays-schedule/`);
+        setIsEventSchedule(false);
+      }
+      if (role === 'guest' || response.data === null) {
+        response = await axiosBackendInstance.get(`attendance/events/todays-schedule/`);
+        setIsEventSchedule(true);
+      }
       //if response.data is null then there is no schedule today and both buttons are disabled. If response.data.check_in_time is null then the user has not checked in yet and the check in button is enabled. If response.data.check_out_time is null then the user has checked in but not checked out yet and the check out button is enabled.
       console.log("todays schedule response", response.data);
-      if (response.data.data === null) {
+      if (response.data === null) {
         setIsCheckInDisabled(true);
         setIsCheckOutDisabled(true);
-      } else if (response.data.data.check_in_time === null) {
+      } else if (response.data.check_in_time === null) {
         setIsCheckInDisabled(false);
         setIsCheckOutDisabled(true);
-      } else if (response.data.data.check_out_time === null) {
+      } else if (response.data.check_out_time === null) {
         setIsCheckInDisabled(true);
         setIsCheckOutDisabled(false);
       } else {
@@ -129,8 +139,10 @@ export default function ClockInOutScreen() {
     const { latitude, longitude } = location.coords;
 
     try {
-      const response = await axiosBackendInstance.post(
-        `attendance/${type}/`,
+      let response = null;
+      if (isEventSchedule) {
+        response = await axiosBackendInstance.post(
+        `attendance/events/check-in/`,
         {
           user_id: id,
           uuid: deviceUUID,
@@ -138,6 +150,17 @@ export default function ClockInOutScreen() {
           longitude,
         }
       );
+    } else {
+        response = await axiosBackendInstance.post(
+          `attendance/${type}/`,
+          {
+            user_id: id,
+            uuid: deviceUUID,
+            latitude,
+            longitude,
+          }
+        );
+    }
 
       if (response.data.status === "success") {
         Toast.show({
@@ -181,7 +204,13 @@ export default function ClockInOutScreen() {
   const { data: upcomingRecords, isLoading: isLoadingRecords, error, refetch } = useQuery({
     queryKey: ["upcomingRecords"],
     queryFn: async () => {
-      const response = await axiosBackendInstance.get(`attendance/upcoming-records/`);
+      let response = null;
+      if (role !== "guest") {
+        response = await axiosBackendInstance.get(`attendance/upcoming-records/`);
+      }
+      if (role === "guest" || response.data?.data.length === 0) {
+        response = await axiosBackendInstance.get(`attendance/events/upcoming-records/`);
+      }
       return response.data;
     },
     refetchOnMount: true,
@@ -191,7 +220,7 @@ export default function ClockInOutScreen() {
   const onRefresh = async () => {
     setRefreshing(true);
     try {
-      await refetch();
+      await Promise.all([refetch(), fetchUserStatus()]);
       Toast.show({ type: "success", text1: "Upcoming schedules refreshed successfully" });
     } catch (error) {
       console.error("Error refreshing upcoming schedules:", error);
@@ -302,7 +331,7 @@ export default function ClockInOutScreen() {
               </TouchableOpacity>
               <Text style={styles.buttonText}>Check In</Text>
             </View>
-            <View style={styles.buttonWrapper}>
+            {role !== 'guest' && !isEventSchedule &&<View style={styles.buttonWrapper}>
               <TouchableOpacity
                 style={[
                   styles.checkOutButton,
@@ -314,7 +343,7 @@ export default function ClockInOutScreen() {
                 { checkInOutButtonPending === "check-out" ? <ActivityIndicator color="white" /> : <MaterialIcons name="location-off" size={30} color="white" />}
               </TouchableOpacity>
               <Text style={styles.buttonText}>Check Out</Text>
-            </View>
+            </View>}
           </View>
         </View>
       </ScrollView>
