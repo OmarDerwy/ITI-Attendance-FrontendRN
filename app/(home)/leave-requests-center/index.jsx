@@ -13,6 +13,7 @@ import {
 import axiosBackendInstance from "../../../api/axios";
 import { useAuthStore } from "@/store/index";
 import { COLORS } from "../../constants/theme";
+import dayjs from 'dayjs';
 
 const { width } = Dimensions.get("window");
 
@@ -118,6 +119,7 @@ export default function LeaveRequestsCenter() {
       <Text style={styles.label}>Track: <Text style={styles.value}>{item.schedule.track.name}</Text></Text>
       <Text style={styles.label}>Session(s): <Text style={styles.value}>{item.schedule.sessions.join(", ")}</Text></Text>
       <Text style={styles.label}>Request Type: <Text style={styles.value}>{item.request_type.replace(/_/g, " ")}</Text></Text>
+      { item.request_type !== "day_excuse" && <Text style={styles.label}>Expected Time: <Text style={styles.value}>{dayjs(item.adjusted_time).format("HH:mm A")}</Text></Text> }
       <Text style={styles.label}>Reason: <Text style={styles.value}>{item.reason}</Text></Text>
       <Text style={styles.label}>Status: <Text style={styles.value}>{item.status}</Text></Text>
       <View style={styles.buttonRow}>
