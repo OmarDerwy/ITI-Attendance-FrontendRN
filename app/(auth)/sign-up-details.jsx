@@ -20,6 +20,7 @@ export default function SignUpDetails() {
   const [university, setUniversity] = useState('')
   const [dobPickerVisible, setDobPickerVisible] = useState(false)
   const [graduationPickerVisible, setGraduationPickerVisible] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   // Helper to format date as YYYY-MM-DD
   const formatDate = (date) => {
@@ -29,8 +30,10 @@ export default function SignUpDetails() {
   }
 
   const onSubmit = async () => {
+    setLoading(true)
     if (!dob || !graduationDate || !major || !gpa || !university) {
       Alert.alert('Missing fields', 'Please fill in all fields.')
+      setLoading(false)
       return
     }
     try {
@@ -52,6 +55,8 @@ export default function SignUpDetails() {
     } catch (error) {
       console.error('Registration error:', error)
       Alert.alert('Registration failed', 'Please check your details and try again.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -123,7 +128,7 @@ export default function SignUpDetails() {
               onChangeText={setGpa}
             />
             <View style={styles.button}>
-              <CustomButton text="Submit" color={COLORS.red} fontSize={FONT_SIZES.medium} buttonHandler={onSubmit} />
+              <CustomButton text="Submit" color={COLORS.red} fontSize={FONT_SIZES.medium} buttonHandler={onSubmit} disabled={loading}/>
             </View>
           </View>
         </Modal>
