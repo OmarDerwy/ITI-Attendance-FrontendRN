@@ -18,6 +18,8 @@ import { useAuthStore } from '@/store/index';
 import LeaveRequestScreen from "../leave-request";
 import LeaveRequestCenter from "../leave-requests-center";
 import GuestEventsScreen from "../guest-events";
+import ScheduleScreen from "../schedule";
+// import EventDetailsScreen from "./event-details";
 
 const { width, height } = Dimensions.get("window");
 
@@ -81,12 +83,28 @@ const screensConfig = [
     buttonLabel: "View Events"
   },
   {
+    name: "Schedule",
+    component: ScheduleScreen,
+    title: "Schedule",
+    allowedRoles: ["student", "guest"],
+    showButton: true,
+    icon: { type: MaterialCommunityIcons, name: "calendar-month", color: "#ac0808", size: 30 },
+    buttonLabel: "View Schedule"
+  },
+  {
     name: "Logout",
     component: LogoutScreen,
     title: "Logout",
     allowedRoles: "all",
     showButton: false
-  }
+  },
+  // {
+  //   name: "EventDetails",
+  //   component: EventDetailsScreen,
+  //   title: "Event Details",
+  //   allowedRoles: ["student", "guest"],
+  //   showButton: false
+  // }
 ];
 
 function HomeScreen({ navigation }) {
@@ -189,6 +207,7 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     flexDirection: "column",
+
   },
   welcome: {
     fontSize: 20,
@@ -220,8 +239,6 @@ const styles = StyleSheet.create({
   actionLabel: {
     marginLeft: 10,
     fontSize: 16,
-    color: "#ac0808",
-    fontWeight: "bold",
   },
 });
 
