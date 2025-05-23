@@ -128,10 +128,17 @@ export default function NotificationsScreen() {
 
       <View style={styles.notificationListWrapper}>
         <FlatList
-          data={displayedNotifications.slice().reverse()} 
+          data={displayedNotifications.slice()}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderNotificationItem}
           contentContainerStyle={styles.notificationList}
+          ListFooterComponent={
+            displayedNotifications.length < notifications.length ? (
+              <TouchableOpacity style={styles.seeMoreButton} onPress={handleSeeMore}>
+                <Text style={styles.seeMoreText}>View More</Text>
+              </TouchableOpacity>
+            ) : null
+          }
         />
       </View>
     </View>

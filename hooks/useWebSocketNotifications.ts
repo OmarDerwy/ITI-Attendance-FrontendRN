@@ -24,7 +24,7 @@ export default function useWebSocketNotifications() {
     const fetchNotifications = async () => {
       try {
         const data = await getUserNotifications();
-        setNotifications(data);
+        setNotifications(data.sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
         setUnreadCount(data.filter((n: Notification) => !n.is_read).length);
         setHasMoreNotifications(data.length > 0); 
       } catch (error) {
