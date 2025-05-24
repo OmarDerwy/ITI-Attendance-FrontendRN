@@ -145,7 +145,7 @@ export default function ReportScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>Report Lost/Found Item</Text>
       </View>
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={styles.container} style={{ marginBottom: 70 }}>
         <TextInput style={styles.label}>Item Name</TextInput>
         <TextInput
           style={styles.input}

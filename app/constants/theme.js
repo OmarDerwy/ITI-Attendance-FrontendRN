@@ -30,4 +30,6 @@ const FONT_WEIGHTS = {
     black: '900'
 };
 
-export { COLORS , SIZES, FONT_SIZES, FONT_WEIGHTS };
+const theme = { COLORS, SIZES, FONT_SIZES, FONT_WEIGHTS };
+export { COLORS, SIZES, FONT_SIZES, FONT_WEIGHTS };
+export default theme;

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { ExpandableCalendar, TimelineList, CalendarProvider, timelineProps, CalendarUtils } from "react-native-calendars";
 import axiosBackendInstance from "../../../api/axios";
@@ -8,6 +8,7 @@ import { useAuthStore } from '@/store/index';
 import { useQuery } from "@tanstack/react-query";
 import groupBy from 'lodash/groupBy';
 import { useWindowDimensions } from "react-native";
+import { useFocusEffect } from '@react-navigation/native';
 
 
 function useLectureSessions(enabled) {
@@ -88,8 +89,8 @@ export default function ScheduleScreen() {
   const showLectures = role === "student";
   const showEvents = role === "student" || role === "guest";
 
-  const { data: lecturesRaw = [], isLoading: loadingLectures } = useLectureSessions(showLectures);
-  const { data: eventsRaw = [], isLoading: loadingEvents } = useEventSessions(showEvents);
+  const { data: lecturesRaw = [], isLoading: loadingLectures, refetch: refetchLectures } = useLectureSessions(showLectures);
+  const { data: eventsRaw = [], isLoading: loadingEvents, refetch: refetchEvents } = useEventSessions(showEvents);
 
   const { height } = useWindowDimensions();
 
@@ -177,6 +178,7 @@ export default function ScheduleScreen() {
         end: new Date(ev.end),
         title: ev.title,
         summary: ev.description,
+        color: ev.type === 'lecture' ? '#fee6e7' : undefined, // Light red for lectures
       })),
       e => CalendarUtils.getCalendarDateString(e.start)
     );
@@ -192,6 +194,13 @@ export default function ScheduleScreen() {
     overlapEventsSpacing: 8,
     rightEdgeSpacing: 24
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (showLectures) refetchLectures();
+      if (showEvents) refetchEvents();
+    }, [showLectures, showEvents, refetchLectures, refetchEvents])
+  );
 
   return (
     <View style={styles.container}>

@@ -70,10 +70,7 @@ export default function useWebSocketNotifications() {
         const newNotification: Notification = {
           id: Date.now(),
           message: data.body || "New notification",
-          created_at: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
+          created_at: new Date().toISOString(), // Use ISO string for valid date
           is_read: false,
         };
         console.log("Before JSON.parse", e.data);
